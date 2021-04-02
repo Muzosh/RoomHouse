@@ -13,7 +13,7 @@
     
 
     <!-- Bootstrap core CSS -->
-<link href="./static/bootstrap.min.css" rel="stylesheet">
+    <link href="./static/bootstrap.min.css" rel="stylesheet">
 
     <style>
       .bd-placeholder-img {
@@ -43,7 +43,7 @@
         <div>
           <h3 class="float-md-start mb-0">RoomHouse</h3>
           <nav class="nav nav-masthead justify-content-center float-md-end">
-            <a class="nav-link active" aria-current="page" href="#">Join Room</a>
+            <a class="nav-link active" aria-current="page" href="#">Create Room</a>
             <a class="nav-link" href="#">Features</a>
             <a class="nav-link" href="#">Leave Room</a>
           </nav>
@@ -52,15 +52,16 @@
 
       <main class="px3">
         <div class="w-50 mx-auto flex-column">
-          <h1>Join Room</h1>
-          <div class="form-group justify-content-center">
-            <input type="username" name=”username” id="username" class="col form-control" placeholder="Name">
-
-            <a href="#" class="btn btn-lg btn-secondary fw-bold border-white bg-white">Join</a>
-          </div>
+          <h1>Create Room</h1>
+          <form class="form-group justify-content-center" method="POST" action="/">
+            <input type="roomname" name=”roomname” id="roomname" class="col form-control" placeholder="Room Name">
+            <input type="username" name=”username” id="username" class="col form-control" placeholder="Display Name">
+            <input type="password" name=”password” id="password" class="col form-control" placeholder="Password">
+            <button href="#" style="background-color: rgb(225, 255, 92);" class="w-100 btn btn-lg btn-secondary fw-bold border-dark bg-white" type="submit">Create</button>
+          </form>
         </div>
 
-        <div id="local" class="participant"><div></div><div>Me</div></div>
+        <div id="local"><div style="width: 100% !important;"></div><div class="mt-auto text-white-50">Me</div></div>
       </main>
 
       <footer class="mt-auto text-white-50">
