@@ -10,35 +10,24 @@
     </nav>
 {% endblock %}
 
-
 {% block content %}
     <div class="w-50 mx-auto flex-column">
         <h1>Create Room</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <h6>{{ message }}</h6>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
         <form class="form-group justify-content-center" method="POST" action="/">
-            <input type="roomname" name=”roomname” id="roomname" class="col form-control" placeholder="Room Name">
-            <input type="username" name=”username” id="username" class="col form-control" placeholder="Display Name">
-            <input type="password" name=”password” id="password" class="col form-control" placeholder="Password">
-            <button href="#" style="background-color: rgb(225, 255, 92);" class="w-100 btn btn-lg btn-secondary fw-bold border-dark bg-white" type="submit">Create</button>
+            <input type="roomname" name='roomname' id="roomname" class="col form-control" placeholder="Room Name">
+            <input type="password" name='password' id="password" class="col form-control" placeholder="Password">
+            <input style="background-color: rgb(225, 255, 92);" class="w-100 btn btn-lg btn-secondary fw-bold border-dark bg-white" type="submit" value='Create'>
         </form>
-    </div>
-
-    <div id="local">
-        <div style="width: 100% !important;"></div>
-        <div class="mt-auto text-white-50">Me</div>
     </div>
 {% endblock %}
 
-{% block script %} 
-    <script src="//media.twiliocdn.com/sdk/js/video/releases/2.3.0/twilio-video.min.js"></script>
-    <script>
-        function addLocalVideo() {
-            Twilio.Video.createLocalVideoTrack().then(track => {
-                let video = document.getElementById('local').firstChild;
-                video.appendChild(track.attach());
-        
-            });
-        };
-
-        addLocalVideo();
-    </script>
+{% block script %}
+    
 {% endblock %}

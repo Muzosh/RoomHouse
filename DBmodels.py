@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from slugify import slugify
 from app import db
 import uuid
 
@@ -7,7 +8,7 @@ class Room(db.Model):
     __tablename__ = 'rooms'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    slug = db.Column(db.String(64), index=True, unique=True)
+    #slug = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
     clients = db.relationship('Client', backref='room')
@@ -17,7 +18,7 @@ class Room(db.Model):
 
     def set_name(self, name):
         self.name = name
-        self.slug = slugify(name)
+        #self.slug = slugify(name)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -40,4 +41,4 @@ class Client(db.Model):
     room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'))
 
     def __repr__(self):
-        return '<Client {}>'.format(self.uuid)
+        return '<Client {}>'.format(self.uuid) 
