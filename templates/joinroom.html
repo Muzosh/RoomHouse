@@ -14,6 +14,13 @@
 {% block content %}
     <div class="w-50 mx-auto flex-column">
         <h1>Join Room</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <h6>{{ message }}</h6>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <form class="form-group justify-content-center" method="POST" action="/">
             <input type="username" name=”username” id="username" class="col form-control" placeholder="Display Name">
             <input type="password" name=”password” id="password" class="col form-control" placeholder="Password">

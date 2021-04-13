@@ -1,7 +1,7 @@
 import os
 import uuid
 import sqlalchemy
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, session
 #from dotenv import load_dotenv
 #from twilio.jwt.access_token import AccessToken
 #from twilio.jwt.access_token.grants import VideoGrant
@@ -88,8 +88,8 @@ def create_room():
             db.session.commit()
                 
             #return render_template('joinroom.html')   
-            #return redirect('/joinroom/{}'.format(room.id), code=302) #tu je problem, css sa nenacita
-            return redirect(url_for('web.joinroom', id=room.id)) #toto asi nefunguje
+            #return redirect('/joinroom/{}'.format(room.id), code=307) #tu je problem, css sa nenacita
+            return redirect(url_for('web.joinroom', id=room.id), code=302) #toto asi nefunguje
         except:
             flash('The room name "{}" is not available'.format(roomname))
             return render_template('createroom.html')
@@ -97,9 +97,26 @@ def create_room():
 @web.route('/joinroom/<id>', methods=['GET', 'POST'])
 def joinroom(id):
     #if request.method == 'GET':
-    #return 'Room id ' + str(id)
+    session['auth'] = False
+
+    room = Room.query.filter(Room.id == id).first()
+    client_name = request.form.get('username')
+    password = request.form.get('password')
+    
+    client = room.authenticate(password)
+    if client:
+        db.session.add(client)
+        db.session.commit()
+        session['auth'] = True
+        session['username'] = client_name
+        return redirect(url_for('web.room', id=room.id), code=302)
+    flash('Incorrect password')
     return render_template('joinroom.html')
 
-
+@web.route('/room/<id>', methods=['GET', 'POST'])
+def room(id):
+    if session.get('auth') == False:
+        return redirect(url_for('web.joinroom', id=room.id), code=302)
+    return 'auth true'
 #if __name__ == '__main__':
 #    app.run(host='127.0.0.1', use_debugger=True)
