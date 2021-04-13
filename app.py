@@ -50,7 +50,8 @@ class Room(db.Model):
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    def authenticate(self, password=None):
+    def authenticate(self, password):
+    #def authenticate(self, password=None):
         """Attempt to authenticate access to the room."""
 
         if ((password is None and self.password_hash is None)
@@ -69,6 +70,9 @@ class Client(db.Model):
 
     def __repr__(self):
         return '<Client {}>'.format(self.uuid) 
+    
+    def set_name(self, name):
+        self.name = name
 
 
 @web.route('/', methods=['GET', 'POST'])
@@ -79,44 +83,49 @@ def create_room():
         roomname = request.form.get('roomname')
         password = request.form.get('password')
         
-        try:
-            room = Room()
-            room.set_name(roomname)
-            if password:
-                room.set_password(password)
-            db.session.add(room)
-            db.session.commit()
-                
-            #return render_template('joinroom.html')   
-            #return redirect('/joinroom/{}'.format(room.id), code=307) #tu je problem, css sa nenacita
-            return redirect(url_for('web.joinroom', id=room.id), code=302) #toto asi nefunguje
-        except:
-            flash('The room name "{}" is not available'.format(roomname))
-            return render_template('createroom.html')
+        #try:
+        room = Room()
+        room.set_name(roomname)
+        #if password:
+        room.set_password(password)
+        db.session.add(room)
+        db.session.commit()
+            
+        #return render_template('joinroom.html')   
+        #return redirect('/joinroom/{}'.format(room.id), code=307) #tu je problem, css sa nenacita
+        return redirect(url_for('web.joinroom', id=room.id), code=307) #toto asi nefunguje
+        # except:
+        #     flash('The room name "{}" is not available'.format(roomname))
+        #     return render_template('createroom.html')
             
 @web.route('/joinroom/<id>', methods=['GET', 'POST'])
 def joinroom(id):
-    #if request.method == 'GET':
-    session['auth'] = False
+    if request.method == 'GET':
+        return render_template('joinroom.html')
+    if request.method == 'POST':
+        session['auth'] = False
 
-    room = Room.query.filter(Room.id == id).first()
-    client_name = request.form.get('username')
-    password = request.form.get('password')
-    
-    client = room.authenticate(password)
-    if client:
-        db.session.add(client)
-        db.session.commit()
-        session['auth'] = True
-        session['username'] = client_name
-        return redirect(url_for('web.room', id=room.id), code=302)
-    flash('Incorrect password')
-    return render_template('joinroom.html')
+        room = Room.query.filter(Room.id == id).first()
+        client_name = request.form.get('username')
+        password = request.form.get('password')
+        
+        if client_name is not None:
+            client = room.authenticate(password)
+            if client:
+                client.set_name(client_name)
+                db.session.add(client)
+                db.session.commit()
+                session['auth'] = True
+                session['username'] = client_name
+                return redirect(url_for('web.room', id=room.id), code=302)
+            flash('Incorrect password')
+            return render_template('joinroom.html')
+        return render_template('joinroom.html')
 
 @web.route('/room/<id>', methods=['GET', 'POST'])
 def room(id):
-    if session.get('auth') == False:
-        return redirect(url_for('web.joinroom', id=room.id), code=302)
+    # if session.get('auth'):
+    #     return redirect(url_for('web.joinroom', id=room.id), code=302)
     return 'auth true'
 
 @web.route('/test', methods=['GET', 'POST'])
