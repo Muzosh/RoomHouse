@@ -32,8 +32,9 @@
                   <H2><span class="badge bg-secondary">SINGEL</span></H2>
               </div>
               <div class="col-12">
-                  <div id="local" style="border-radius: 10px;border: 5px solid black;margin:40px;">
-                      <img src="https://i.picsum.photos/id/275/4288/2848.jpg?hmac=DHPZUN0qLc6KRiIP21_mfYCi-BxH9JKNYPPJRhG8t40" class="img-fluid" alt="...">
+                  <div id="localS" style="border-radius: 10px;border: 5px solid black;margin:40px;">
+                      <div></div>
+                      <!--<img src="https://i.picsum.photos/id/275/4288/2848.jpg?hmac=DHPZUN0qLc6KRiIP21_mfYCi-BxH9JKNYPPJRhG8t40" class="img-fluid" alt="...">-->
                   </div>
                     <div class="mt-auto text-white-50">Name</div>
               </div>
@@ -74,7 +75,8 @@
                   <H2><span class="badge bg-secondary">DOUBLE SOME</span></H2>
               </div>
               <div class="col-6">
-                  <div id="local2" style="border-radius: 10px;border: 5px solid black;margin:40px;">
+                  <div id="localS" style="border-radius: 10px;border: 5px solid black;margin:40px;">
+                      <div></div>
                       <img src="https://i.picsum.photos/id/275/4288/2848.jpg?hmac=DHPZUN0qLc6KRiIP21_mfYCi-BxH9JKNYPPJRhG8t40" class="img-fluid" alt="...">
                   </div>
                     <div class="mt-auto text-white-50">Name2</div>
@@ -282,11 +284,11 @@
 {% endblock %}
 
 {% block script %}
-    <script src="//media.twiliocdn.com/sdk/js/video/releases/2.3.0/twilio-video.min.js"></script>
+    <script src="//media.twiliocdn.com/sdk/js/video/releases/2.3.0/twilio-video.min.js" ></script>
     <script>
         function addLocalVideo() {
             Twilio.Video.createLocalVideoTrack({width: 400,height:300}).then(track => {
-                let video = document.getElementById('local').firstElementChild;
+                let video = document.getElementById("localS").firstElementChild;
                 video.appendChild(track.attach());
             });
         };

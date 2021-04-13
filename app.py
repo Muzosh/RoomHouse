@@ -118,5 +118,10 @@ def room(id):
     if session.get('auth') == False:
         return redirect(url_for('web.joinroom', id=room.id), code=302)
     return 'auth true'
+
+@web.route('/test', methods=['GET', 'POST'])
+def testroom():
+    return render_template('room.html')
+
 #if __name__ == '__main__':
 #    app.run(host='127.0.0.1', use_debugger=True)
