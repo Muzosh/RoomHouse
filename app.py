@@ -87,17 +87,18 @@ def create_room():
             db.session.add(room)
             db.session.commit()
                 
-            return redirect('/joinroom/{}'.format(room.id), code=307) #tu je problem, css sa nenacita
-            #return redirect(url_for('joinroom',id=room.id)) #toto asi nefunguje
+            #return render_template('joinroom.html')   
+            #return redirect('/joinroom/{}'.format(room.id), code=302) #tu je problem, css sa nenacita
+            return redirect(url_for('web.joinroom', id=room.id)) #toto asi nefunguje
         except:
             flash('The room name "{}" is not available'.format(roomname))
             return render_template('createroom.html')
             
 @web.route('/joinroom/<id>', methods=['GET', 'POST'])
 def joinroom(id):
-    if request.method == 'GET':
+    #if request.method == 'GET':
     #return 'Room id ' + str(id)
-        return render_template('joinroom.html')
+    return render_template('joinroom.html')
 
 
 #if __name__ == '__main__':
