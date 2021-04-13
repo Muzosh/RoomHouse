@@ -6,19 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 from database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.blueprints import Blueprint
-from flask_wtf import FlaskForm
-from wtforms import BooleanField, HiddenField, PasswordField, SelectField, StringField, SubmitField
-from wtforms.validators import DataRequired
 
 web = Blueprint('web', __name__,
                  template_folder='templates',
                  static_folder='static')
-
-
-class JoinRoomForm(FlaskForm):
-    username = StringField('username', validators=[DataRequired()])
-    password = PasswordField('password')
-    submit = SubmitField('Join')
 
 
 class Room(db.Model):
@@ -85,53 +76,43 @@ def create_room():
         except:
             flash('The room name "{}" is not available'.format(roomname))
             return render_template('createroom.html')
-       
-            
+
 @web.route('/joinroom/<id>', methods=['GET', 'POST'])
 def joinroom(id):
-    form = JoinRoomForm()
     if request.method == 'GET':
         session['auth'] = False
-        return render_template('joinroom.html', form=form)
+        return render_template('joinroom.html')
     
     if request.method == 'POST':
         session['auth'] = False
         room = Room.query.filter(Room.id == id).first()
-        #client_name = request.form.get('username')
-        #password = request.form.get('password')
-        #if request.form.validate_on_submit():          treba vytvorit na to form
-        if form.validate_on_submit:
-            #client_name = request.form.get('username')
-            #password = request.form.get('password')
-            client_name = form.username.data
-            password = form.password.data
-            #client = room.authenticate(password=password)
+        username = request.form.get("username")
+        password = request.form.get("password")
+        
+        if username:
             client = room.authenticate(password=password)
             if client:
-                client.set_name(client_name)
+                client.set_name(username)
                 db.session.add(client)
                 db.session.commit()
                 session['auth'] = True
-                session['username'] = client_name
+                session['username'] = username
                 return redirect(url_for('web.room', id=room.id), code=302)
             
             flash('Incorrect password')
-            return render_template('joinroom.html', form=form)
+            return render_template('joinroom.html')
         
-        flash(str(client_name) + ' ' + str(password))
-        return render_template('joinroom.html',form=form)
+        flash("Username is required!")
+        return render_template('joinroom.html')
 
 
 @web.route('/room/<id>', methods=['GET', 'POST'])
 def room(id):
-    # if session.get('auth'):
-    #     return redirect(url_for('web.joinroom', id=room.id), code=302)
+    if not session.get('auth'):
+        return redirect(url_for('web.joinroom', id=id), code=302)
     return 'auth true'
 
 
 @web.route('/test', methods=['GET', 'POST'])
 def testroom():
     return render_template('room.html')
-
-#if __name__ == '__main__':
-#    app.run(host='127.0.0.1', use_debugger=True)

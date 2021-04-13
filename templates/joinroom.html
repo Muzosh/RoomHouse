@@ -22,10 +22,8 @@
             {% endif %}
         {% endwith %}
         <form class="form-group justify-content-center" method="POST" action="">
-            <!-- <input type="username" name=”username” id="username" class="col form-control" placeholder="Display Name">
-            <input type="password" name=”password” id="password" class="col form-control" placeholder="Password"> -->
-            {{ form.username() }}
-            {{ form.password() }}
+            <input type="username" name="username" id="username" class="col form-control" placeholder="Display Name">
+            <input type="password" name="password" id="password" class="col form-control" placeholder="Password">
             <div id="local">
                 <div style="width: 100% !important;">
                 </div>
@@ -33,7 +31,6 @@
                     Me
                 </div>
             </div>
-
             <input style="background-color: rgb(225, 255, 92);" class="w-100 btn btn-lg btn-secondary fw-bold border-dark bg-white" id="submit" name="submit" type="submit" value="Join">
         </form>
     </div>
