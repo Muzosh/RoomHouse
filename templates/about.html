@@ -5,8 +5,9 @@
 {% block header %}
     <h1 class="float-md-start mb-0">About project</h1>
     <nav class="nav nav-masthead justify-content-center float-md-end">
-        <a class="nav-link"  href="/">Create Room</a>
-        <a class="nav-link active" aria-current="page" href="/about">About</a>
+        <a class="nav-link" onclick="set_id()">Active room</a>
+        <a class="nav-link active" href="#">About</a>
+        <a class="nav-link" href="#authors">Leave</a>
     </nav>
 {% endblock %}
 
@@ -26,4 +27,10 @@
 {% endblock %}
 
 {% block script %}
+<script>
+    function set_id(){	
+        var room_id  = '{{ room_id }}';
+        window.location.href = "/room/" + room_id;
+    }
+</script>
 {% endblock %}

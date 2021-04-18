@@ -108,6 +108,8 @@ def joinroom(id):
                 session['auth'] = True
                 session['token'] = token.to_jwt().decode()
                 session['username'] = username
+                session['roomname'] = room.name
+                session['roomid'] = room.id
                 
                 return redirect(url_for('web.room', id=room.id), code=302)
             
@@ -124,9 +126,9 @@ def room(id):
         return redirect(url_for('web.joinroom', id=id), code=302)
    
     access_token = {'token': session.get('token')}
-    return render_template('room.html', token=access_token)
+    return render_template('room.html', client_name=session.get('username'), room_name=session.get('roomname'), token=access_token)
 
 
 @web.route('/about', methods=['GET', 'POST'])
 def about_page():
-    return render_template('about.html')
+    return render_template('about.html', room_id=session.get('roomname'))
