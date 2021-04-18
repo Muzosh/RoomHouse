@@ -6,6 +6,12 @@ from flask_sqlalchemy import SQLAlchemy
 from database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask.blueprints import Blueprint
+from twilio.jwt.access_token import AccessToken
+from twilio.jwt.access_token.grants import VideoGrant
+
+twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+twilio_api_key_sid = os.environ.get('TWILIO_API_KEY_SID')
+twilio_api_key_secret = os.environ.get('TWILIO_API_KEY_SECRET')
 
 web = Blueprint('web', __name__,
                  template_folder='templates',
@@ -95,8 +101,14 @@ def joinroom(id):
                 client.set_name(username)
                 db.session.add(client)
                 db.session.commit()
+                
+                token = AccessToken(twilio_account_sid, twilio_api_key_sid, twilio_api_key_secret, identity=username)
+                token.add_grant(VideoGrant(room=room.id))
+                
                 session['auth'] = True
+                session['token'] = token.to_jwt().decode()
                 session['username'] = username
+                
                 return redirect(url_for('web.room', id=room.id), code=302)
             
             flash('Incorrect password')
@@ -110,7 +122,9 @@ def joinroom(id):
 def room(id):
     if not session.get('auth'):
         return redirect(url_for('web.joinroom', id=id), code=302)
-    return 'auth true'
+   
+    access_token = {'token': session.get('token')}
+    return render_template('room.html', token=access_token)
 
 
 @web.route('/test', methods=['GET', 'POST'])

@@ -4,15 +4,15 @@ import os.path
 from app import Room, Client
 from app import web
 from dotenv import load_dotenv
-from twilio.jwt.access_token import AccessToken
-from twilio.jwt.access_token.grants import VideoGrant
+# from twilio.jwt.access_token import AccessToken
+# from twilio.jwt.access_token.grants import VideoGrant
 
 
 def create_app():
     load_dotenv()
-    twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-    twilio_api_key_sid = os.environ.get('TWILIO_API_KEY_SID')
-    twilio_api_key_secret = os.environ.get('TWILIO_API_KEY_SECRET')
+    # twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+    # twilio_api_key_sid = os.environ.get('TWILIO_API_KEY_SID')
+    # twilio_api_key_secret = os.environ.get('TWILIO_API_KEY_SECRET')
     app = Flask(__name__)
     app.config['DEBUG'] = True
     db_path = os.path.join(os.path.dirname(__file__), 'database.db')
