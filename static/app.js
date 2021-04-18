@@ -1,4 +1,6 @@
 let room = 0;
+const container = document.getElementById('container');
+let connected = false;
 
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack({width: 400,height:300}).then(track => {
@@ -18,7 +20,12 @@ function connect(token) {
             room.on('participantConnected', participantConnected);
             room.on('participantDisconnected', participantDisconnected);
             resolve();
+
+            connected = true;
+            updateParticipantCount();
+
             console.log(room)
+            resolve()
         }).catch(() => {
             reject();
         });
@@ -31,10 +38,17 @@ function connectButtonHandler(event) {
     console.log("Petaneee")
 };
 
+function updateParticipantCount() {
+    if (!connected)
+        count.innerHTML = 'Disconnected.';
+    else
+        count.innerHTML = (room.participants.size + 1) + ' participants online.';
+};
+
 function participantConnected(participant) {
     let participantDiv = document.createElement('div');
     participantDiv.setAttribute('id', participant.sid);
-    participantDiv.setAttribute('class', 'participant');
+    //participantDiv.setAttribute('class', 'participant');
 
     let tracksDiv = document.createElement('div');
     participantDiv.appendChild(tracksDiv);
