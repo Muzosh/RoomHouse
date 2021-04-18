@@ -3,16 +3,18 @@
 {% block title %}RoomHouse{% endblock %}
 
 {% block header %}
-    <h3 class="float-md-start mb-0">RoomHouse</h3>
+    <h1 class="float-md-start mb-0">RoomHouse</h1>
     <nav class="nav nav-masthead justify-content-center float-md-end">
         <a class="nav-link active" aria-current="page" href="#">Create Room</a>
-        <a class="nav-link" href="#">About</a>
+        <a class="nav-link" href="/about">About</a>
     </nav>
 {% endblock %}
 
 {% block content %}
     <div class="w-50 mx-auto flex-column">
-        <h1>Create Room</h1>
+        <h1>Create a perfect room for you!</h1>
+        <p style="font-size: 24px;padding: 50px;">Cupcake ipsum dolor sit amet. Jelly fruitcake pudding wafer cake bonbon cake. Liquorice toffee marshmallow biscuit sweet chocolate dragée. Sweet roll pastry jelly-o donut soufflé toffee jelly-o gummi bears.</p>
+
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             {% for message in messages %}
@@ -21,9 +23,9 @@
           {% endif %}
         {% endwith %}
         <form class="form-group justify-content-center" method="POST" action="">
-            <input type="roomname" name="roomname" id="roomname" class="col form-control" placeholder="Room Name">
-            <input type="password" name="password" id="password" class="col form-control" placeholder="Password">
-            <input style="background-color: rgb(225, 255, 92);" class="w-100 btn btn-lg btn-secondary fw-bold border-dark bg-white" type="submit" value='Create'>
+            <input type="roomname" name="roomname" id="roomname" class="col form-control" placeholder="Room Name" style="margin: 20px auto 0px;width: 80%;align-items: center;font-size: 20px;">
+            <input type="password" name="password" id="password" class="col form-control" placeholder="Password" style="margin: 0px auto 20px;width: 80%;align-items: center;font-size: 20px;">
+            <input type="submit" class="w-50 btn btn-lg btn-primary border-dark" value='Create a room' style="margin: 20px auto;width: 80%;text-align: center;align-items: center;">
         </form>
     </div>
 {% endblock %}

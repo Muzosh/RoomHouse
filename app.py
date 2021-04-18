@@ -127,6 +127,6 @@ def room(id):
     return render_template('room.html', token=access_token)
 
 
-@web.route('/test', methods=['GET', 'POST'])
-def testroom():
-    return render_template('room.html')
+@web.route('/about', methods=['GET', 'POST'])
+def about_page():
+    return render_template('about.html')
