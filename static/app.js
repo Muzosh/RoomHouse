@@ -228,8 +228,6 @@ function trackUnsubscribed(track) {
 };
 
 function shareScreenHandler(name) {
-    screenOnHandler();
-
     if (!screen) {
         let screenDiv = document.createElement('div');
         screenDiv.setAttribute('id', name + ' - screen');
@@ -268,7 +266,6 @@ function shareScreenHandler(name) {
     }
     else {
         document.getElementById(name + ' - screen').remove();
-        screenOffHandler();
         room.localParticipant.unpublishTrack(screenTrack);
         screenTrack.stop();
         screenTrack = null;
