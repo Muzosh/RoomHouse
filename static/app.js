@@ -48,8 +48,8 @@ function cameraOnHandler(){
     cameraOn.style.display = "block";
     cameraOn.style.color = "#00cc00";
     cameraOff.style.display = "none";
-    muteOrUnmuteYourMedia(room, 'video', 'mute')
-    console.log("zapal si kameru");
+    muteOrUnmuteYourMedia(room, 'video', 'unmute')
+    //console.log("zapal si kameru");
 }
 
 function cameraOffHandler() {
@@ -57,8 +57,8 @@ function cameraOffHandler() {
     cameraOff.style.display = "block";
     cameraOff.style.color = "#cc0000";
     cameraOn.style.display = "none";
-    console.log("vypal si kameru");
-    muteOrUnmuteYourMedia(room, 'video', 'unmute')
+    //console.log("vypal si kameru");
+    muteOrUnmuteYourMedia(room, 'video', 'mute')
 }
 
 function microphoneOnHandler(){
@@ -66,7 +66,7 @@ function microphoneOnHandler(){
     microphoneOn.style.display = "block";
     microphoneOn.style.color = "#00cc00";
     microphoneOff.style.display = "none";
-    console.log("zapal si mic");
+    //console.log("zapal si mic");
     //audioMuteHandler();
     muteOrUnmuteYourMedia(room, 'audio', 'unmute')
 }
@@ -76,26 +76,26 @@ function microphoneOffHandler(){
     microphoneOff.style.display = "block";
     microphoneOff.style.color = "#cc0000";
     microphoneOn.style.display = "none";
-    console.log("vypal si mic");
+    //console.log("vypal si mic");
     //audioMuteHandler();
     muteOrUnmuteYourMedia(room, 'audio', 'mute')
 }
 
 function screenOnHandler(name){
     //zapatie screensharu
-    screenshareOn.style.display = "block";
+    /* screenshareOn.style.display = "block";
     screenshareOn.style.color = "#00cc00";
-    screenshareOff.style.display = "none";
-    console.log("zapal si screen");
+    screenshareOff.style.display = "none"; */
+    //console.log("zapal si screen");
     shareScreenHandler(name);
 }
 
 function screenOffHandler(name){
     //vypatie screensharu
-    screenshareOff.style.display = "block";
+    /* screenshareOff.style.display = "block";
     screenshareOff.style.color = "#cc0000";
-    screenshareOn.style.display = "none";
-    console.log("vypal si screen");
+    screenshareOn.style.display = "none"; */
+    //console.log("vypal si screen");
     shareScreenHandler(name);
 }
 
@@ -104,7 +104,7 @@ function userAddHandler(){
     participantAdd.style.display = "block";
     participantAdd.style.color = "#00cc00";
     participantRemove.style.display = "none";
-    console.log("pridal si usera");
+    //console.log("pridal si usera");
 }
 
 function userRemoveHandler(){
@@ -112,7 +112,7 @@ function userRemoveHandler(){
     participantRemove.style.display = "none";
     participantRemove.style.color = "#cc0000";
     participantAdd.style.display = "none";
-    console.log("odobral si usera");
+    //console.log("odobral si usera");
 }
 
 function muteOrUnmuteYourMedia(room, kind, action) {
@@ -159,8 +159,8 @@ function videoHandler(){
 }; */
 
 function connect(token) {
-    console.log("Connectni se petaneeeee")
-    console.log(token)
+    //console.log("Connectni se petaneeeee")
+    //console.log(token)
     let promise = new Promise((resolve, reject) => {
         // get a token from the back end
         Twilio.Video.connect(token).then(_room => {
@@ -179,7 +179,7 @@ function connect(token) {
             reject();
         });
     });
-    console.log(promise)
+    //console.log(promise)
     return promise;
 };
 
@@ -229,10 +229,14 @@ function trackUnsubscribed(track) {
 
 function shareScreenHandler(name) {
     if (!screen) {
+        screenshareOn.style.display = "block";
+        screenshareOn.style.color = "#00cc00";
+        screenshareOff.style.display = "none";
+
         let screenDiv = document.createElement('div');
         screenDiv.setAttribute('id', name + ' - screen');
         screenDiv.setAttribute('style', 'border-radius: 10px;border: 5px solid black;margin:40px;');
-        console.log(screenDiv);
+        //console.log(screenDiv);
         let tracksDiv = document.createElement('div');
         screenDiv.appendChild(tracksDiv);
         let labelDiv = document.createElement('div');
@@ -257,7 +261,7 @@ function shareScreenHandler(name) {
             screenDiv.setAttribute('style', 'border-radius: 10px;border: 5px solid black;margin:40px;');
             screenDiv.createElement('div').appendChild(screenTrack.attach) */
 
-            console.log(screenTrack);
+            //console.log(screenTrack);
             //shareScreen.innerHTML = 'Stop sharing';
             screen = true;
         }).catch(() => {
@@ -265,6 +269,9 @@ function shareScreenHandler(name) {
         });
     }
     else {
+        screenshareOff.style.display = "block";
+        screenshareOff.style.color = "#cc0000";
+        screenshareOn.style.display = "none";
         document.getElementById(name + ' - screen').remove();
         room.localParticipant.unpublishTrack(screenTrack);
         screenTrack.stop();
