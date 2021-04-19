@@ -12,19 +12,22 @@ let connected = false;
 let screen = false;
 let screenTrack;
 let mute = true;
+let video = true;
+
+cameraOff.style.display = "block";
+cameraOn.style.display = "none";
+microphoneOff.style.display = "block";
+microphoneOn.style.display = "none";
+screenshareOff.style.display = "none";
+screenshareOn.style.display = "block";
+participantAdd.style.display = "block";
+participantRemove.style.display = "none";
 
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack({width: 400,height:300}).then(track => {
         let video = document.getElementById("local").firstElementChild;
         video.appendChild(track.attach());
-        cameraOff.style.display = "block";
-        cameraOn.style.display = "none";
-        microphoneOff.style.display = "block";
-        microphoneOn.style.display = "none";
-        screenshareOff.style.display = "none";
-        screenshareOn.style.display = "block";
-        participantAdd.style.display = "block";
-        participantRemove.style.display = "none";
+        
     });
 };
 
@@ -32,41 +35,46 @@ function cameraOffHandler() {
     cameraOff.style.display = "none";
     cameraOn.style.display = "block";
     console.log("vypal si kameru");
-
+    //videoHandler();
+    muteOrUnmuteYourMedia(room, 'video', 'mute')
 }
 
 function cameraOnHandler(){
     cameraOff.style.display = "block";
     cameraOn.style.display = "none";
     console.log("zapal si kameru");
+    //videoHandler();
+    muteOrUnmuteYourMedia(room, 'video', 'unmute')
 }
 
 function microphoneOnHandler(){
     microphoneOff.style.display = "block";
     microphoneOn.style.display = "none";
     console.log("zapal si mic");
-    audioMuteHandler();
+    //audioMuteHandler();
+    muteOrUnmuteYourMedia(room, 'audio', 'unmute')
 }
 
 function microphoneOffHandler(){
     microphoneOff.style.display = "none";
     microphoneOn.style.display = "block";
     console.log("vypal si mic");
-    audioMuteHandler();
+    //audioMuteHandler();
+    muteOrUnmuteYourMedia(room, 'audio', 'mute')
 }
 
-function screenOnHandler(){
+function screenOnHandler(name){
     screenshareOff.style.display = "block";
     screenshareOn.style.display = "none";
     console.log("zapal si screen");
-    shareScreenHandler("norko");
+    shareScreenHandler(name);
 }
 
-function screenOffHandler(){
+function screenOffHandler(name){
     screenshareOff.style.display = "none";
     screenshareOn.style.display = "block";
     console.log("vypal si screen");
-    shareScreenHandler("norko");
+    shareScreenHandler(name);
 }
 
 function userAddHandler(){
@@ -80,6 +88,49 @@ function userRemoveHandler(){
     participantRemove.style.display = "none";
     console.log("odobral si usera");
 }
+
+function muteOrUnmuteYourMedia(room, kind, action) {
+    const publications = kind === 'audio' ? room.localParticipant.audioTracks : room.localParticipant.videoTracks;
+  
+    publications.forEach(function(publication) {
+      if (action === 'mute') {
+        publication.track.disable();
+      } else {
+        publication.track.enable();
+      }
+    });
+  }
+
+/* function audioMuteHandler(){
+    if(mute){
+        room.localParticipant.audioTracks.forEach(publication => {
+            publication.track.disable();
+          });
+        mute = false;
+    }
+    else {
+        room.localParticipant.audioTracks.forEach(publication => {
+            publication.track.enable()
+          });
+        mute = true;
+    }    
+};
+
+function videoHandler(){
+    if(video){
+        room.localParticipant.audioTracks.forEach(publication => {
+            publication.track.disable();
+        });
+        
+        video = false;
+    }
+    else {
+        room.localParticipant.videoTracks.forEach(publication => {
+            publication.track.enable()
+          });
+        video = true;
+    }    
+}; */
 
 function connect(token) {
     console.log("Connectni se petaneeeee")
@@ -161,6 +212,8 @@ function shareScreenHandler(name) {
         let tracksDiv = document.createElement('div');
         screenDiv.appendChild(tracksDiv);
         let labelDiv = document.createElement('div');
+        labelDiv.setAttribute('class', 'mt-auto text-white-50');
+        labelDiv.innerHTML = name + ' - screen';
         screenDiv.appendChild(labelDiv);
         container.appendChild(screenDiv);
 
@@ -193,21 +246,7 @@ function shareScreenHandler(name) {
         screenTrack.stop();
         screenTrack = null;
         screen = false;
-        //shareScreen.innerHTML = 'Share screen';
     }
 };
 
-function audioMuteHandler(){
-    if(mute){
-        room.localParticipant.audioTracks.forEach(publication => {
-            publication.track.disable();
-          });
-        mute = false;
-    }
-    else {
-        room.localParticipant.audioTracks.forEach(publication => {
-            publication.track.enable()
-          });
-        mute = true;
-    }    
-};
+
