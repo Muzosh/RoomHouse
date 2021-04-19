@@ -158,12 +158,12 @@ function videoHandler(){
     }    
 }; */
 
-function connect(token) {
+function connect(token, roomid) {
     //console.log("Connectni se petaneeeee")
     //console.log(token)
     let promise = new Promise((resolve, reject) => {
         // get a token from the back end
-        Twilio.Video.connect(token).then(_room => {
+        Twilio.Video.connect(token, {name : roomid}).then(_room => {
             room = _room;
             room.participants.forEach(participantConnected);
             room.on('participantConnected', participantConnected);

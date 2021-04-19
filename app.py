@@ -126,7 +126,7 @@ def room(id):
         return redirect(url_for('web.joinroom', id=id), code=302)
    
     access_token = {'token': session.get('token')}
-    return render_template('room.html', client_name=session.get('username'), room_name=session.get('roomname'), token=access_token)
+    return render_template('room.html', client_name=session.get('username'), room_id=id, room_name=session.get('roomname'), token=access_token)
 
 
 @web.route('/about', methods=['GET', 'POST'])
