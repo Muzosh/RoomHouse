@@ -14,78 +14,104 @@ let screenTrack;
 let mute = true;
 let video = true;
 
-cameraOff.style.display = "block";
-cameraOn.style.display = "none";
-microphoneOff.style.display = "block";
-microphoneOn.style.display = "none";
-screenshareOff.style.display = "none";
-screenshareOn.style.display = "block";
-participantAdd.style.display = "block";
-participantRemove.style.display = "none";
+firstLoad();
+
+function firstLoad(){
+    //uvodne nastavenie ikoniek
+    cameraOn.style.display = "block"; //zapata kamera
+    cameraOn.style.color = "#00cc00"; //zapata zelena kamera
+    cameraOff.style.display = "none";
+    microphoneOn.style.display = "block"; //zapaty mic
+
+    microphoneOn.style.color = "#00cc00"; //zapaty zeleny mic
+    microphoneOff.style.display = "none";
+
+    screenshareOn.style.display = "block"; //zapata moznost zdielania screenu
+    screenshareOn.style.color = "white";
+    screenshareOff.style.display = "none";
+
+    participantAdd.style.display = "block"; //zapata moznost pridania usera
+    participantRemove.style.display = "none";
+    participantAdd.style.color = "white";
+}
+
 
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack({width: 400,height:300}).then(track => {
         let video = document.getElementById("local").firstElementChild;
         video.appendChild(track.attach());
-        
     });
 };
 
-function cameraOffHandler() {
-    cameraOff.style.display = "none";
+function cameraOnHandler(){
+    //zapatie kamery
     cameraOn.style.display = "block";
-    console.log("vypal si kameru");
-    //videoHandler();
+    cameraOn.style.color = "#00cc00";
+    cameraOff.style.display = "none";
     muteOrUnmuteYourMedia(room, 'video', 'mute')
+    console.log("zapal si kameru");
 }
 
-function cameraOnHandler(){
+function cameraOffHandler() {
+    //vypnutie kamery
     cameraOff.style.display = "block";
+    cameraOff.style.color = "#cc0000";
     cameraOn.style.display = "none";
-    console.log("zapal si kameru");
-    //videoHandler();
+    console.log("vypal si kameru");
     muteOrUnmuteYourMedia(room, 'video', 'unmute')
 }
 
 function microphoneOnHandler(){
-    microphoneOff.style.display = "block";
-    microphoneOn.style.display = "none";
+    //zapatie mic
+    microphoneOn.style.display = "block";
+    microphoneOn.style.color = "#00cc00";
+    microphoneOff.style.display = "none";
     console.log("zapal si mic");
     //audioMuteHandler();
     muteOrUnmuteYourMedia(room, 'audio', 'unmute')
 }
 
 function microphoneOffHandler(){
-    microphoneOff.style.display = "none";
-    microphoneOn.style.display = "block";
+    //vypatie mic
+    microphoneOff.style.display = "block";
+    microphoneOff.style.color = "#cc0000";
+    microphoneOn.style.display = "none";
     console.log("vypal si mic");
     //audioMuteHandler();
     muteOrUnmuteYourMedia(room, 'audio', 'mute')
 }
 
 function screenOnHandler(name){
-    screenshareOff.style.display = "block";
-    screenshareOn.style.display = "none";
+    //zapatie screensharu
+    screenshareOn.style.display = "block";
+    screenshareOn.style.color = "#00cc00";
+    screenshareOff.style.display = "none";
     console.log("zapal si screen");
     shareScreenHandler(name);
 }
 
 function screenOffHandler(name){
-    screenshareOff.style.display = "none";
-    screenshareOn.style.display = "block";
+    //vypatie screensharu
+    screenshareOff.style.display = "block";
+    screenshareOff.style.color = "#cc0000";
+    screenshareOn.style.display = "none";
     console.log("vypal si screen");
     shareScreenHandler(name);
 }
 
 function userAddHandler(){
-    participantAdd.style.display = "none";
-    participantRemove.style.display = "block";
+    //pridanie usera
+    participantAdd.style.display = "block";
+    participantAdd.style.color = "#00cc00";
+    participantRemove.style.display = "none";
     console.log("pridal si usera");
 }
 
 function userRemoveHandler(){
-    participantAdd.style.display = "block";
+    //odobranie usera
     participantRemove.style.display = "none";
+    participantRemove.style.color = "#cc0000";
+    participantAdd.style.display = "none";
     console.log("odobral si usera");
 }
 
@@ -202,7 +228,7 @@ function trackUnsubscribed(track) {
 };
 
 function shareScreenHandler(name) {
-    //event.preventDefault();
+    screenOnHandler();
 
     if (!screen) {
         let screenDiv = document.createElement('div');
@@ -242,6 +268,7 @@ function shareScreenHandler(name) {
     }
     else {
         document.getElementById(name + ' - screen').remove();
+        screenOffHandler();
         room.localParticipant.unpublishTrack(screenTrack);
         screenTrack.stop();
         screenTrack = null;
