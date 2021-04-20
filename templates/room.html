@@ -308,9 +308,9 @@
     <script src="{{ url_for('static', filename='app.js') }}"></script>
     <script>
         var token = "{{token.token}}";
-        var id = '{{ client_name }}'
-        var roomid = '{{ room_id }}'
-        connect(token, roomid);
+        var id = '{{ client_name }}';
+        var roomId = "{{ room_id }}";
+        createLocalTracksAndConnect(token, roomId);
     </script>
-    <script>addLocalVideo();</script>
+    <script>addLocalVideo()</script>
 {% endblock %}

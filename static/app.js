@@ -16,7 +16,7 @@ let video = true;
 
 firstLoad();
 
-function firstLoad(){
+function firstLoad() {
     //uvodne nastavenie ikoniek
     cameraOn.style.display = "block"; //zapata kamera
     cameraOn.style.color = "#00cc00"; //zapata zelena kamera
@@ -35,15 +35,7 @@ function firstLoad(){
     participantAdd.style.color = "white";
 }
 
-
-function addLocalVideo() {
-    Twilio.Video.createLocalVideoTrack({width: 400,height:300}).then(track => {
-        let video = document.getElementById("local").firstElementChild;
-        video.appendChild(track.attach());
-    });
-};
-
-function cameraOnHandler(){
+function cameraOnHandler() {
     //zapatie kamery
     cameraOn.style.display = "block";
     cameraOn.style.color = "#00cc00";
@@ -61,7 +53,7 @@ function cameraOffHandler() {
     muteOrUnmuteYourMedia(room, 'video', 'mute')
 }
 
-function microphoneOnHandler(){
+function microphoneOnHandler() {
     //zapatie mic
     microphoneOn.style.display = "block";
     microphoneOn.style.color = "#00cc00";
@@ -71,7 +63,7 @@ function microphoneOnHandler(){
     muteOrUnmuteYourMedia(room, 'audio', 'unmute')
 }
 
-function microphoneOffHandler(){
+function microphoneOffHandler() {
     //vypatie mic
     microphoneOff.style.display = "block";
     microphoneOff.style.color = "#cc0000";
@@ -81,7 +73,7 @@ function microphoneOffHandler(){
     muteOrUnmuteYourMedia(room, 'audio', 'mute')
 }
 
-function screenOnHandler(name){
+function screenOnHandler(name) {
     //zapatie screensharu
     /* screenshareOn.style.display = "block";
     screenshareOn.style.color = "#00cc00";
@@ -90,7 +82,7 @@ function screenOnHandler(name){
     shareScreenHandler(name);
 }
 
-function screenOffHandler(name){
+function screenOffHandler(name) {
     //vypatie screensharu
     /* screenshareOff.style.display = "block";
     screenshareOff.style.color = "#cc0000";
@@ -99,7 +91,7 @@ function screenOffHandler(name){
     shareScreenHandler(name);
 }
 
-function userAddHandler(){
+function userAddHandler() {
     //pridanie usera
     participantAdd.style.display = "block";
     participantAdd.style.color = "#00cc00";
@@ -107,7 +99,7 @@ function userAddHandler(){
     //console.log("pridal si usera");
 }
 
-function userRemoveHandler(){
+function userRemoveHandler() {
     //odobranie usera
     participantRemove.style.display = "none";
     participantRemove.style.color = "#cc0000";
@@ -117,15 +109,15 @@ function userRemoveHandler(){
 
 function muteOrUnmuteYourMedia(room, kind, action) {
     const publications = kind === 'audio' ? room.localParticipant.audioTracks : room.localParticipant.videoTracks;
-  
-    publications.forEach(function(publication) {
-      if (action === 'mute') {
-        publication.track.disable();
-      } else {
-        publication.track.enable();
-      }
+
+    publications.forEach(function (publication) {
+        if (action === 'mute') {
+            publication.track.disable();
+        } else {
+            publication.track.enable();
+        }
     });
-  }
+}
 
 /* function audioMuteHandler(){
     if(mute){
@@ -158,27 +150,76 @@ function videoHandler(){
     }    
 }; */
 
-function connect(token, roomid) {
+function addLocalVideo() {
+    Twilio.Video.createLocalVideoTrack({
+        width: 400,
+        height: 300
+    }).then(track => {
+        let video = document.getElementById("local").firstElementChild;
+        video.appendChild(track.attach());
+    });
+};
+
+function createLocalTracksAndConnect(token, roomId) {
     //console.log("Connectni se petaneeeee")
     //console.log(token)
-    let promise = new Promise((resolve, reject) => {
-        // get a token from the back end
-        Twilio.Video.connect(token, {name : roomid}).then(_room => {
-            room = _room;
-            room.participants.forEach(participantConnected);
-            room.on('participantConnected', participantConnected);
-            room.on('participantDisconnected', participantDisconnected);
-            resolve();
-
-            connected = true;
-            updateParticipantCount();
-
-            //console.log(room)
-            resolve()
-        }).catch(() => {
-            reject();
+    Twilio.Video.createLocalTracks({
+        audio: true,
+        video: {
+            height: 300,
+            frameRate: 30,
+            width: 300
+        }
+    }).then(localTracks => {
+        return Twilio.Video.connect(token, {
+            name: roomId,
+            tracks: localTracks,
+            audio: true,
+            video: {
+                height: 300,
+                frameRate: 30,
+                width: 300
+            },
+            bandwidthProfile: {
+                video: {
+                    mode: 'grid',
+                    maxTracks: 10,
+                    renderDimensions: {
+                        high: {
+                            height: 1080,
+                            width: 1980
+                        },
+                        standard: {
+                            height: 800,
+                            width: 800
+                        },
+                        low: {
+                            height: 176,
+                            width: 144
+                        }
+                    }
+                }
+            },
+            maxAudioBitrate: 16000, //For music remove this line
+            //For multiparty rooms (participants>=3) uncomment the line below
+            //preferredVideoCodecs: [{ codec: 'VP8', simulcast: true }],
+            networkQuality: {
+                local: 1,
+                remote: 1
+            }
         });
-    });
+    }).then(room => {
+        console.log('Successfully joined a Room: ', room.name);
+
+        room.participants.forEach(participantConnected);
+
+        room.on('participantConnected', participantConnected);
+        room.on('participantDisconnected', participantDisconnected);
+        resolve();
+
+        connected = true;
+        updateParticipantCount();
+    })
     //console.log(promise)
     return promise;
 };
@@ -248,7 +289,9 @@ function shareScreenHandler(name) {
         navigator.mediaDevices.getDisplayMedia().then(stream => {
             screenTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
             room.localParticipant.publishTrack(screenTrack);
-            screenTrack.mediaStreamTrack.onended = () => { shareScreenHandler() };
+            screenTrack.mediaStreamTrack.onended = () => {
+                shareScreenHandler()
+            };
 
             /*let video = document.getElementById("local").firstElementChild;
             video.appendChild(screenTrack.attach());*/
@@ -267,8 +310,7 @@ function shareScreenHandler(name) {
         }).catch(() => {
             alert('Could not share the screen.')
         });
-    }
-    else {
+    } else {
         screenshareOff.style.display = "block";
         screenshareOff.style.color = "#cc0000";
         screenshareOn.style.display = "none";
@@ -279,5 +321,3 @@ function shareScreenHandler(name) {
         screen = false;
     }
 };
-
-
