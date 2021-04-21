@@ -306,6 +306,7 @@
 {% block script %}
     <script src="//media.twiliocdn.com/sdk/js/video/releases/2.3.0/twilio-video.min.js"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script>firstLoad()</script>
     <script>
         var token = "{{ token }}";
         var roomId = "{{ room_id }}";

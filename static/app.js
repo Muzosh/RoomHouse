@@ -1,4 +1,6 @@
-let room = 0;
+let localRoom;
+const participantCount = document.getelementById('participantCount')
+const inviteLink = document.getElementById('inviteLink')
 const container = document.getElementById('container');
 const cameraOn = document.getElementById("camera-on");
 const cameraOff = document.getElementById("camera-off");
@@ -13,8 +15,6 @@ let screen = false;
 let screenTrack;
 let mute = true;
 let video = true;
-
-firstLoad();
 
 function firstLoad() {
     //uvodne nastavenie ikoniek
@@ -33,6 +33,8 @@ function firstLoad() {
     participantAdd.style.display = "block"; //zapata moznost pridania usera
     participantRemove.style.display = "none";
     participantAdd.style.color = "white";
+
+    inviteLink.innerHTML = window.location.href.replace("room", "joinroom")
 }
 
 function cameraOnHandler() {
@@ -40,7 +42,7 @@ function cameraOnHandler() {
     cameraOn.style.display = "block";
     cameraOn.style.color = "#00cc00";
     cameraOff.style.display = "none";
-    muteOrUnmuteYourMedia(room, 'video', 'unmute')
+    muteOrUnmuteYourMedia(localRoom, 'video', 'unmute')
     //console.log("zapal si kameru");
 }
 
@@ -50,7 +52,7 @@ function cameraOffHandler() {
     cameraOff.style.color = "#cc0000";
     cameraOn.style.display = "none";
     //console.log("vypal si kameru");
-    muteOrUnmuteYourMedia(room, 'video', 'mute')
+    muteOrUnmuteYourMedia(localRoom, 'video', 'mute')
 }
 
 function microphoneOnHandler() {
@@ -60,7 +62,7 @@ function microphoneOnHandler() {
     microphoneOff.style.display = "none";
     //console.log("zapal si mic");
     //audioMuteHandler();
-    muteOrUnmuteYourMedia(room, 'audio', 'unmute')
+    muteOrUnmuteYourMedia(localRoom, 'audio', 'unmute')
 }
 
 function microphoneOffHandler() {
@@ -70,7 +72,7 @@ function microphoneOffHandler() {
     microphoneOn.style.display = "none";
     //console.log("vypal si mic");
     //audioMuteHandler();
-    muteOrUnmuteYourMedia(room, 'audio', 'mute')
+    muteOrUnmuteYourMedia(localRoom, 'audio', 'mute')
 }
 
 function userAddHandler() {
@@ -117,54 +119,67 @@ function connect(token, roomId) {
         audio: true,
         video: {
             width: 400,
-            height: 300
+            height: 300,
+            resizeMode: "crop-and-scale"
         }
     }).then(localTracks => {
         return Twilio.Video.connect(token, {
             name: roomId,
             tracks: localTracks,
+            automaticSubscription: true,
             bandwidthProfile: {
                 video: {
-                  mode: 'grid',
-                  maxTracks: 0,
-                  renderDimensions: {
-                    high: {height:1080, width:1920},
-                    standard: {height:720, width:1280},
-                    low: {height:176, width:144}
-                  }
+                    mode: 'grid',
+                    maxTracks: 0,
+                    renderDimensions: {
+                        high: {
+                            height: 1080,
+                            width: 1920
+                        },
+                        standard: {
+                            height: 720,
+                            width: 1280
+                        },
+                        low: {
+                            height: 176,
+                            width: 144
+                        }
+                    }
                 }
-              },
+            },
             maxAudioBitrate: 16000, //For music remove this line
             //For multiparty rooms (participants>=3) uncomment the line below
-            preferredVideoCodecs: [{ codec: 'VP8', simulcast: true }],
+            preferredVideoCodecs: [{
+                codec: 'VP8',
+                simulcast: true
+            }],
             networkQuality: {
                 local: 1,
                 remote: 1
             }
         });
     }).then(room => {
+        localRoom = room
         console.log('Successfully joined a Room: ', room.name);
 
         room.participants.forEach(participantConnected);
 
         room.on('participantConnected', participantConnected);
         room.on('participantDisconnected', participantDisconnected);
-
-        room.on('participantConnected', participant => {
-            console.log(`A remote Participant connected: ${participant}`);
-        });
-        updateParticipantCount();
         connected = true;
+        updateParticipantCount();
     }, error => {
-        console.error(`Unable to connect to Room: ${error.message}`);
+        console.error("Unable to connect to Room: ", error.message);
     });
 };
 
 function updateParticipantCount() {
-    if (!connected)
+    if (!connected) {
         console.log = 'Disconnected.';
-    else
-        count.innerHTML = (room.participants.size + 1) + ' participants online.';
+        participantCount.innerHTML = 'You seem to be disconnected.';
+    } else {
+        participantCount.innerHTML = (room.participants.size) + ' participants online.';
+    }
 };
 
 function participantConnected(participant) {
@@ -182,10 +197,11 @@ function participantConnected(participant) {
     container.appendChild(participantDiv);
 
     participant.tracks.forEach(publication => {
-        if (publication.isSubscribed)
-            trackSubscribed(tracksDiv, publication.track);
+        if (publication.isSubscribed){
+            trackSubscribed(tracksDiv, labelDiv, publication.track, participant.identity);
+        }
     });
-    participant.on('trackSubscribed', track => trackSubscribed(tracksDiv, track));
+    participant.on('trackSubscribed', track => trackSubscribed(tracksDiv, labelDiv, track, participant.identity));
     participant.on('trackUnsubscribed', trackUnsubscribed);
 
     updateParticipantCount();
@@ -196,8 +212,25 @@ function participantDisconnected(participant) {
     updateParticipantCount();
 };
 
-function trackSubscribed(div, track) {
+function trackSubscribed(div, labelDiv, track, participantIdentity) {
     div.appendChild(track.attach());
+    if (track.kind == "audio") {
+        if (!track.isEnabled) {
+            labelDiv.innerHTML = participantIdentity + " (muted)"
+        }
+
+        track.on(
+            'disabled',
+            () => {
+                labelDiv.innerHTML = participantIdentity + " (muted)"
+            });
+        
+        track.on(
+            'enabled',
+            () => {
+                labelDiv.innerHTML = participantIdentity
+            });
+    }
 };
 
 function trackUnsubscribed(track) {
@@ -224,7 +257,7 @@ function shareScreenHandler(name) {
 
         navigator.mediaDevices.getDisplayMedia().then(stream => {
             screenTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
-            room.localParticipant.publishTrack(screenTrack);
+            localRoom.localParticipant.publishTrack(screenTrack);
             screenTrack.mediaStreamTrack.onended = () => {
                 shareScreenHandler()
             };
@@ -251,7 +284,7 @@ function shareScreenHandler(name) {
         screenshareOff.style.color = "#cc0000";
         screenshareOn.style.display = "none";
         document.getElementById(name + ' - screen').remove();
-        room.localParticipant.unpublishTrack(screenTrack);
+        localRoom.localParticipant.unpublishTrack(screenTrack);
         screenTrack.stop();
         screenTrack = null;
         screen = false;
