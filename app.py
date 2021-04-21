@@ -96,37 +96,44 @@ def joinroom(id):
         password = request.form.get("password")
         
         if username:
-            client = room.authenticate(password=password)
-            if client:
-                client.set_name(username)
-                db.session.add(client)
-                db.session.commit()
-                
-                token = AccessToken(twilio_account_sid, twilio_api_key_sid, twilio_api_key_secret, identity=username)
-                token.add_grant(VideoGrant(room=room.id))
-                
-                session['auth'] = True
-                session['token'] = token.to_jwt().decode()
-                session['username'] = username
-                session['roomname'] = room.name
-                session['roomid'] = room.id
-                
-                return redirect(url_for('web.room', id=room.id), code=302)
             
-            flash('Incorrect password')
-            return render_template('joinroom.html')
+            # Commented IfElse should prevent you from kicking someone by taking your name
+            #  problem is that we cant delete from this DB when disconnecting, so even you disconnect, you cant use your name to get back
+            # if db.session.query(Client).filter_by(Client.name == username, Client.room_id == id).first() is not None
         
-        flash("Username is required!")
-        return render_template('joinroom.html')
+                client = room.authenticate(password=password)
+                if client:
+                    client.set_name(username)
+                    db.session.add(client)
+                    db.session.commit()
+                    
+                    token = AccessToken(twilio_account_sid, twilio_api_key_sid, twilio_api_key_secret, identity=username)
+                    token.add_grant(VideoGrant(room=room.id))
+                    
+                    session['auth'] = True
+                    session['token'] = token.to_jwt().decode()
+                    session['username'] = username
+                    session['roomname'] = room.name
+                    session['roomid'] = room.id
+                    
+                    return redirect(url_for('web.room', id=room.id), code=302)
+                else:
+                    flash('Incorrect password')
+                    return render_template('joinroom.html')
+            # else:
+            #     flash('Username already exists!')
+            #     return render_template('joinroom.html')
+        else:
+            flash("Username is required!")
+            return render_template('joinroom.html')
 
 
 @web.route('/room/<id>', methods=['GET', 'POST'])
 def room(id):
     if not session.get('auth'):
         return redirect(url_for('web.joinroom', id=id), code=302)
-   
-    access_token = {'token': session.get('token')}
-    return render_template('room.html', client_name=session.get('username'), room_id=id, room_name=session.get('roomname'), token=access_token)
+
+    return render_template('room.html', room_id=id, room_name=session.get('roomname'), token=session.get('token'))
 
 
 @web.route('/about', methods=['GET', 'POST'])

@@ -73,24 +73,6 @@ function microphoneOffHandler() {
     muteOrUnmuteYourMedia(room, 'audio', 'mute')
 }
 
-function screenOnHandler(name) {
-    //zapatie screensharu
-    /* screenshareOn.style.display = "block";
-    screenshareOn.style.color = "#00cc00";
-    screenshareOff.style.display = "none"; */
-    //console.log("zapal si screen");
-    shareScreenHandler(name);
-}
-
-function screenOffHandler(name) {
-    //vypatie screensharu
-    /* screenshareOff.style.display = "block";
-    screenshareOff.style.color = "#cc0000";
-    screenshareOn.style.display = "none"; */
-    //console.log("vypal si screen");
-    shareScreenHandler(name);
-}
-
 function userAddHandler() {
     //pridanie usera
     participantAdd.style.display = "block";
@@ -110,7 +92,7 @@ function userRemoveHandler() {
 function muteOrUnmuteYourMedia(room, kind, action) {
     const publications = kind === 'audio' ? room.localParticipant.audioTracks : room.localParticipant.videoTracks;
 
-    publications.forEach(function (publication) {
+    publications.forEach(publication => {
         if (action === 'mute') {
             publication.track.disable();
         } else {
@@ -119,90 +101,42 @@ function muteOrUnmuteYourMedia(room, kind, action) {
     });
 }
 
-/* function audioMuteHandler(){
-    if(mute){
-        room.localParticipant.audioTracks.forEach(publication => {
-            publication.track.disable();
-          });
-        mute = false;
-    }
-    else {
-        room.localParticipant.audioTracks.forEach(publication => {
-            publication.track.enable()
-          });
-        mute = true;
-    }    
-};
-
-function videoHandler(){
-    if(video){
-        room.localParticipant.audioTracks.forEach(publication => {
-            publication.track.disable();
-        });
-        
-        video = false;
-    }
-    else {
-        room.localParticipant.videoTracks.forEach(publication => {
-            publication.track.enable()
-          });
-        video = true;
-    }    
-}; */
-
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack({
         width: 400,
-        height: 300
+        height: 300,
+        resizeMode: "crop-and-scale"
     }).then(track => {
         let video = document.getElementById("local").firstElementChild;
         video.appendChild(track.attach());
     });
 };
 
-function createLocalTracksAndConnect(token, roomId) {
-    //console.log("Connectni se petaneeeee")
-    //console.log(token)
+function connect(token, roomId) {
     Twilio.Video.createLocalTracks({
         audio: true,
         video: {
-            height: 300,
-            frameRate: 30,
-            width: 300
+            width: 400,
+            height: 300
         }
     }).then(localTracks => {
         return Twilio.Video.connect(token, {
             name: roomId,
             tracks: localTracks,
-            audio: true,
-            video: {
-                height: 300,
-                frameRate: 30,
-                width: 300
-            },
             bandwidthProfile: {
                 video: {
-                    mode: 'grid',
-                    maxTracks: 10,
-                    renderDimensions: {
-                        high: {
-                            height: 1080,
-                            width: 1980
-                        },
-                        standard: {
-                            height: 800,
-                            width: 800
-                        },
-                        low: {
-                            height: 176,
-                            width: 144
-                        }
-                    }
+                  mode: 'grid',
+                  maxTracks: 0,
+                  renderDimensions: {
+                    high: {height:1080, width:1920},
+                    standard: {height:720, width:1280},
+                    low: {height:176, width:144}
+                  }
                 }
-            },
+              },
             maxAudioBitrate: 16000, //For music remove this line
             //For multiparty rooms (participants>=3) uncomment the line below
-            //preferredVideoCodecs: [{ codec: 'VP8', simulcast: true }],
+            preferredVideoCodecs: [{ codec: 'VP8', simulcast: true }],
             networkQuality: {
                 local: 1,
                 remote: 1
@@ -215,13 +149,15 @@ function createLocalTracksAndConnect(token, roomId) {
 
         room.on('participantConnected', participantConnected);
         room.on('participantDisconnected', participantDisconnected);
-        resolve();
 
-        connected = true;
+        room.on('participantConnected', participant => {
+            console.log(`A remote Participant connected: ${participant}`);
+        });
         updateParticipantCount();
-    })
-    //console.log(promise)
-    return promise;
+        connected = true;
+    }, error => {
+        console.error(`Unable to connect to Room: ${error.message}`);
+    });
 };
 
 function updateParticipantCount() {
