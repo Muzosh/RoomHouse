@@ -1,5 +1,5 @@
 let localRoom;
-const participantCount = document.getelementById('participantCount')
+const participantCount = document.getElementById('participantsCount')
 const inviteLink = document.getElementById('inviteLink')
 const container = document.getElementById('container');
 const cameraOn = document.getElementById("camera-on");
@@ -178,7 +178,7 @@ function updateParticipantCount() {
         console.log = 'Disconnected.';
         participantCount.innerHTML = 'You seem to be disconnected.';
     } else {
-        participantCount.innerHTML = (room.participants.size) + ' participants online.';
+        participantCount.innerHTML = (localRoom.participants.size + 1) + ' participant(s) online.';
     }
 };
 
