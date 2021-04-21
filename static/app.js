@@ -254,6 +254,9 @@ function trackSubscribed(track, participant) {
         screenDiv.appendChild(labelDiv);
         screenShareContainerRow.appendChild(screenDiv);
         screenDiv.childNodes[0].appendChild(track.attach());
+        screenDiv.childNodes[0].childNodes[0].setAttribute("width", 1280)
+        screenDiv.childNodes[0].childNodes[0].setAttribute("height", 720)
+
     }
 };
 
@@ -284,12 +287,7 @@ function shareScreenHandler(name) {
         screenDiv.appendChild(labelDiv);
         screenShareContainerRow.appendChild(screenDiv);
 
-        navigator.mediaDevices.getDisplayMedia({
-                video: {
-                    width: 1280,
-                    height: 720
-                }
-            })
+        navigator.mediaDevices.getDisplayMedia()
             .then(stream => {
                 screenTrack = new Twilio.Video.LocalVideoTrack(
                     stream.getTracks()[0], {
@@ -299,6 +297,8 @@ function shareScreenHandler(name) {
 
                 let video = document.getElementById(name + '_screen').firstElementChild;
                 video.appendChild(screenTrack.attach());
+                video.childNodes[0].setAttribute("width", 1280)
+                video.childNodes[0].setAttribute("height", 720)
 
                 screen = true;
             }).catch(() => {
