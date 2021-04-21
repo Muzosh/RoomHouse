@@ -2,6 +2,7 @@ let localRoom;
 const participantCount = document.getElementById('participantsCount')
 const inviteLink = document.getElementById('inviteLink')
 const containerRow = document.getElementById('containerRow');
+const screenShareContainerRow = document.getElementById('screenShareContainerRow')
 const cameraOn = document.getElementById("camera-on");
 const cameraOff = document.getElementById("camera-off");
 const microphoneOn = document.getElementById("microphone-on");
@@ -83,8 +84,8 @@ function muteOrUnmuteYourMedia(room, kind, action) {
 
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack({
-        width: 344,
-        height: 258,
+        width: 320,
+        height: 240,
         resizeMode: "crop-and-scale"
     }).then(track => {
         let video = document.getElementById("local").firstElementChild;
@@ -96,8 +97,8 @@ function connect(token, roomId) {
     Twilio.Video.createLocalTracks({
         audio: true,
         video: {
-            width: 344,
-            height: 258,
+            width: 320,
+            height: 240,
             resizeMode: "crop-and-scale"
         }
     }).then(localTracks => {
@@ -161,138 +162,153 @@ function updateParticipantCount() {
 };
 
 function participantConnected(participant) {
-    let participantDiv = document.createElement('div');
-    participantDiv.setAttribute('class', 'col-2')
-    participantDiv.setAttribute('id', participant.sid);
-    participantDiv.setAttribute('style', 'width: fit-content; height: fit-content; border-radius: 10px;border: 5px solid black;margin:20px;');
-
-    let tracksDiv = document.createElement('div');
-    participantDiv.appendChild(tracksDiv);
-
-    let avatar = document.createElement('img');
-    avatar.src = "../static/avatar.jpg"
-    avatar.width = 344
-    avatar.height = 258
-    participantDiv.appendChild(avatar);
-
-    let labelDiv = document.createElement('div');
-    labelDiv.innerHTML = participant.identity;
-    participantDiv.appendChild(labelDiv);
-
-    containerRow.appendChild(participantDiv);
-
-    participant.tracks.forEach(publication => {
-        if (publication.isSubscribed) {
-            trackSubscribed(tracksDiv, labelDiv, publication.track, participant.identity, avatar);
-        }
-    });
-    participant.on('trackSubscribed', track => trackSubscribed(tracksDiv, labelDiv, track, participant.identity, avatar));
-    participant.on('trackUnsubscribed', trackUnsubscribed);
-
+    participant.on('trackSubscribed', track => trackSubscribed(track, participant));
+    participant.on('trackUnsubscribed', track => trackUnsubscribed(track, participant));
     updateParticipantCount();
 };
 
 function participantDisconnected(participant) {
     document.getElementById(participant.sid).remove();
+    if (document.getElementById(participant.sid + "_screen") != null) {
+        document.getElementById(participant.sid + "_screen").remove()
+    }
     updateParticipantCount();
 };
 
-function trackSubscribed(div, labelDiv, track, participantIdentity, avatar) {
-    div.appendChild(track.attach());
-    if (track.kind == "audio") {
-        if (!track.isEnabled) {
-            labelDiv.innerHTML = participantIdentity + " (muted)"
+function trackSubscribed(track, participant) {
+    if (!track.name.includes("screen")) {
+        let participantDiv = document.getElementById(participant.sid)
+        if (participantDiv == null) {
+            participantDiv = document.createElement('div')
+            participantDiv.setAttribute('class', 'col-2')
+            participantDiv.setAttribute('id', participant.sid);
+            participantDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
+
+            let tracksDiv = document.createElement('div');
+            participantDiv.appendChild(tracksDiv);
+
+            let avatar = document.createElement('img');
+            avatar.src = "../static/avatar.jpg"
+            avatar.width = 320
+            avatar.height = 240
+            participantDiv.appendChild(avatar);
+
+            let labelDiv = document.createElement('div');
+            labelDiv.innerHTML = participant.identity;
+            participantDiv.appendChild(labelDiv);
+
+            containerRow.appendChild(participantDiv);
         }
 
-        track.on(
-            'disabled',
-            () => {
-                labelDiv.innerHTML = participantIdentity + " (muted)"
-            });
+        participantDiv.childNodes[0].appendChild(track.attach());
 
-        track.on(
-            'enabled',
-            () => {
-                labelDiv.innerHTML = participantIdentity
-            });
-    }
+        if (track.kind == "audio") {
+            if (!track.isEnabled) {
+                participantDiv.childNodes[2].innerHTML = participant.identity + " (muted)"
+            }
 
-    if (track.kind == "video") {
-        if (track.isEnabled) {
-            avatar.style.display = "none"
-            div.style.display = "block"
-        } else {
-            avatar.style.display = "block"
-            div.style.display = "none"
+            track.on(
+                'disabled',
+                () => {
+                    participantDiv.childNodes[2].innerHTML = participant.identity + " (muted)"
+                });
+
+            track.on(
+                'enabled',
+                () => {
+                    participantDiv.childNodes[2].innerHTML = participant.identity
+                });
         }
 
-        track.on(
-            'disabled',
-            () => {
-                avatar.style.display = "block"
-                div.style.display = "none"
-            });
+        if (track.kind == "video") {
+            if (track.isEnabled) {
+                participantDiv.childNodes[1].style.display = "none"
+                participantDiv.childNodes[0].style.display = "block"
+            } else {
+                participantDiv.childNodes[1].style.display = "block"
+                participantDiv.childNodes[0].style.display = "none"
+            }
 
-        track.on(
-            'enabled',
-            () => {
-                avatar.style.display = "none"
-                div.style.display = "block"
-            });
+            track.on(
+                'disabled',
+                () => {
+                    participantDiv.childNodes[1].style.display = "block"
+                    participantDiv.childNodes[0].style.display = "none"
+                });
+
+            track.on(
+                'enabled',
+                () => {
+                    participantDiv.childNodes[1].style.display = "none"
+                    participantDiv.childNodes[0].style.display = "block"
+                });
+        }
+    } else {
+        let screenDiv = document.createElement('div');
+        screenDiv.setAttribute('id', participant.sid + '_screen');
+        screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
+        let tracksDiv = document.createElement('div');
+        screenDiv.appendChild(tracksDiv);
+        let labelDiv = document.createElement('div');
+        labelDiv.innerHTML = participant.identity + ' - screen';
+        screenDiv.appendChild(labelDiv);
+        screenShareContainerRow.appendChild(screenDiv);
+        screenDiv.childNodes[0].appendChild(track.attach());
     }
 };
 
-function trackUnsubscribed(track) {
-    track.detach().forEach(element => element.remove());
+function trackUnsubscribed(track, participant) {
+    if (track.name.includes("screen")) {
+        document.getElementById(participant.sid + "_screen").remove()
+    } else {
+        track.detach().forEach(element => element.remove());
+    }
+
+    updateParticipantCount();
 };
 
 function shareScreenHandler(name) {
     if (!screen) {
-        screenshareOn.style.display = "block";
-        screenshareOn.style.color = "#00cc00";
-        screenshareOff.style.display = "none";
+        screenshareOn.style.display = "none";
+        screenshareOff.style.display = "block";
+        screenshareOff.style.color = "#00cc00";
 
         let screenDiv = document.createElement('div');
-        screenDiv.setAttribute('id', name + ' - screen');
-        screenDiv.setAttribute('style', 'border-radius: 10px;border: 5px solid black;margin:20px;');
-        //console.log(screenDiv);
+        screenDiv.setAttribute('id', name + '_screen');
+        screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
+
         let tracksDiv = document.createElement('div');
         screenDiv.appendChild(tracksDiv);
         let labelDiv = document.createElement('div');
-        labelDiv.setAttribute('class', 'mt-auto text-white-50');
         labelDiv.innerHTML = name + ' - screen';
         screenDiv.appendChild(labelDiv);
-        containerRow.appendChild(screenDiv);
+        screenShareContainerRow.appendChild(screenDiv);
 
-        navigator.mediaDevices.getDisplayMedia().then(stream => {
-            screenTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
-            localRoom.localParticipant.publishTrack(screenTrack);
-            screenTrack.mediaStreamTrack.onended = () => {
-                shareScreenHandler()
-            };
+        navigator.mediaDevices.getDisplayMedia({
+                video: {
+                    width: 1280,
+                    height: 720
+                }
+            })
+            .then(stream => {
+                screenTrack = new Twilio.Video.LocalVideoTrack(
+                    stream.getTracks()[0], {
+                        name: name + '_screen'
+                    });
+                localRoom.localParticipant.publishTrack(screenTrack);
 
-            /*let video = document.getElementById("local").firstElementChild;
-            video.appendChild(screenTrack.attach());*/
+                let video = document.getElementById(name + '_screen').firstElementChild;
+                video.appendChild(screenTrack.attach());
 
-            let video = document.getElementById(name + ' - screen').firstElementChild;
-            video.appendChild(screenTrack.attach());
-
-            /* let screenDiv = container.createElement('div');
-            screenDiv.setAttribute('id', name + ' - screen');
-            screenDiv.setAttribute('style', 'border-radius: 10px;border: 5px solid black;margin:40px;');
-            screenDiv.createElement('div').appendChild(screenTrack.attach) */
-
-            //console.log(screenTrack);
-            //shareScreen.innerHTML = 'Stop sharing';
-            screen = true;
-        }).catch(() => {
-            alert('Could not share the screen.')
-        });
+                screen = true;
+            }).catch(() => {
+                alert('Could not share the screen.')
+            });
     } else {
-        screenshareOff.style.display = "block";
-        screenshareOff.style.color = "#cc0000";
-        screenshareOn.style.display = "none";
-        document.getElementById(name + ' - screen').remove();
+        screenshareOff.style.display = "none";
+        screenshareOn.style.color = "white";
+        screenshareOn.style.display = "block";
+        document.getElementById(name + '_screen').remove();
         localRoom.localParticipant.unpublishTrack(screenTrack);
         screenTrack.stop();
         screenTrack = null;
