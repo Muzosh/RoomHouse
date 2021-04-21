@@ -1,15 +1,13 @@
 let localRoom;
 const participantCount = document.getElementById('participantsCount')
 const inviteLink = document.getElementById('inviteLink')
-const container = document.getElementById('container');
+const containerRow = document.getElementById('containerRow');
 const cameraOn = document.getElementById("camera-on");
 const cameraOff = document.getElementById("camera-off");
 const microphoneOn = document.getElementById("microphone-on");
 const microphoneOff = document.getElementById("microphone-off");
 const screenshareOn = document.getElementById("screenshare-on");
 const screenshareOff = document.getElementById("screenshare-off");
-const participantAdd = document.getElementById("participant-add");
-const participantRemove = document.getElementById("participant-remove");
 let connected = false;
 let screen = false;
 let screenTrack;
@@ -29,10 +27,6 @@ function firstLoad() {
     screenshareOn.style.display = "block"; //zapata moznost zdielania screenu
     screenshareOn.style.color = "white";
     screenshareOff.style.display = "none";
-
-    participantAdd.style.display = "block"; //zapata moznost pridania usera
-    participantRemove.style.display = "none";
-    participantAdd.style.color = "white";
 
     inviteLink.innerHTML = window.location.href.replace("room", "joinroom")
 }
@@ -75,22 +69,6 @@ function microphoneOffHandler() {
     muteOrUnmuteYourMedia(localRoom, 'audio', 'mute')
 }
 
-function userAddHandler() {
-    //pridanie usera
-    participantAdd.style.display = "block";
-    participantAdd.style.color = "#00cc00";
-    participantRemove.style.display = "none";
-    //console.log("pridal si usera");
-}
-
-function userRemoveHandler() {
-    //odobranie usera
-    participantRemove.style.display = "none";
-    participantRemove.style.color = "#cc0000";
-    participantAdd.style.display = "none";
-    //console.log("odobral si usera");
-}
-
 function muteOrUnmuteYourMedia(room, kind, action) {
     const publications = kind === 'audio' ? room.localParticipant.audioTracks : room.localParticipant.videoTracks;
 
@@ -105,8 +83,8 @@ function muteOrUnmuteYourMedia(room, kind, action) {
 
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack({
-        width: 400,
-        height: 300,
+        width: 344,
+        height: 258,
         resizeMode: "crop-and-scale"
     }).then(track => {
         let video = document.getElementById("local").firstElementChild;
@@ -118,8 +96,8 @@ function connect(token, roomId) {
     Twilio.Video.createLocalTracks({
         audio: true,
         video: {
-            width: 400,
-            height: 300,
+            width: 344,
+            height: 258,
             resizeMode: "crop-and-scale"
         }
     }).then(localTracks => {
@@ -184,24 +162,31 @@ function updateParticipantCount() {
 
 function participantConnected(participant) {
     let participantDiv = document.createElement('div');
+    participantDiv.setAttribute('class', 'col-2')
     participantDiv.setAttribute('id', participant.sid);
-    participantDiv.setAttribute('style', 'border-radius: 10px;border: 5px solid black;margin:40px;');
+    participantDiv.setAttribute('style', 'width: fit-content; height: fit-content; border-radius: 10px;border: 5px solid black;margin:20px;');
 
     let tracksDiv = document.createElement('div');
     participantDiv.appendChild(tracksDiv);
+
+    let avatar = document.createElement('img');
+    avatar.src = "../static/avatar.jpg"
+    avatar.width = 344
+    avatar.height = 258
+    participantDiv.appendChild(avatar);
 
     let labelDiv = document.createElement('div');
     labelDiv.innerHTML = participant.identity;
     participantDiv.appendChild(labelDiv);
 
-    container.appendChild(participantDiv);
+    containerRow.appendChild(participantDiv);
 
     participant.tracks.forEach(publication => {
-        if (publication.isSubscribed){
-            trackSubscribed(tracksDiv, labelDiv, publication.track, participant.identity);
+        if (publication.isSubscribed) {
+            trackSubscribed(tracksDiv, labelDiv, publication.track, participant.identity, avatar);
         }
     });
-    participant.on('trackSubscribed', track => trackSubscribed(tracksDiv, labelDiv, track, participant.identity));
+    participant.on('trackSubscribed', track => trackSubscribed(tracksDiv, labelDiv, track, participant.identity, avatar));
     participant.on('trackUnsubscribed', trackUnsubscribed);
 
     updateParticipantCount();
@@ -212,7 +197,7 @@ function participantDisconnected(participant) {
     updateParticipantCount();
 };
 
-function trackSubscribed(div, labelDiv, track, participantIdentity) {
+function trackSubscribed(div, labelDiv, track, participantIdentity, avatar) {
     div.appendChild(track.attach());
     if (track.kind == "audio") {
         if (!track.isEnabled) {
@@ -224,11 +209,35 @@ function trackSubscribed(div, labelDiv, track, participantIdentity) {
             () => {
                 labelDiv.innerHTML = participantIdentity + " (muted)"
             });
-        
+
         track.on(
             'enabled',
             () => {
                 labelDiv.innerHTML = participantIdentity
+            });
+    }
+
+    if (track.kind == "video") {
+        if (track.isEnabled) {
+            avatar.style.display = "none"
+            div.style.display = "block"
+        } else {
+            avatar.style.display = "block"
+            div.style.display = "none"
+        }
+
+        track.on(
+            'disabled',
+            () => {
+                avatar.style.display = "block"
+                div.style.display = "none"
+            });
+
+        track.on(
+            'enabled',
+            () => {
+                avatar.style.display = "none"
+                div.style.display = "block"
             });
     }
 };
@@ -245,7 +254,7 @@ function shareScreenHandler(name) {
 
         let screenDiv = document.createElement('div');
         screenDiv.setAttribute('id', name + ' - screen');
-        screenDiv.setAttribute('style', 'border-radius: 10px;border: 5px solid black;margin:40px;');
+        screenDiv.setAttribute('style', 'border-radius: 10px;border: 5px solid black;margin:20px;');
         //console.log(screenDiv);
         let tracksDiv = document.createElement('div');
         screenDiv.appendChild(tracksDiv);
@@ -253,7 +262,7 @@ function shareScreenHandler(name) {
         labelDiv.setAttribute('class', 'mt-auto text-white-50');
         labelDiv.innerHTML = name + ' - screen';
         screenDiv.appendChild(labelDiv);
-        container.appendChild(screenDiv);
+        containerRow.appendChild(screenDiv);
 
         navigator.mediaDevices.getDisplayMedia().then(stream => {
             screenTrack = new Twilio.Video.LocalVideoTrack(stream.getTracks()[0]);
