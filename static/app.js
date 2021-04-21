@@ -254,8 +254,8 @@ function trackSubscribed(track, participant) {
         screenDiv.appendChild(labelDiv);
         screenShareContainerRow.appendChild(screenDiv);
         screenDiv.childNodes[0].appendChild(track.attach());
-        screenDiv.childNodes[0].childNodes[0].setAttribute("width", 1280)
-        screenDiv.childNodes[0].childNodes[0].setAttribute("height", 720)
+        screenDiv.childNodes[0].childNodes[0].setAttribute("width", '100%')
+        screenDiv.childNodes[0].childNodes[0].setAttribute("height", 'auto')
 
     }
 };
@@ -297,8 +297,8 @@ function shareScreenHandler(name) {
 
                 let video = document.getElementById(name + '_screen').firstElementChild;
                 video.appendChild(screenTrack.attach());
-                video.childNodes[0].setAttribute("width", 1280)
-                video.childNodes[0].setAttribute("height", 720)
+                video.childNodes[0].setAttribute("width", '100%')
+                video.childNodes[0].setAttribute("height", 'auto')
 
                 screen = true;
             }).catch(() => {
