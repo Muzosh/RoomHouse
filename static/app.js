@@ -200,9 +200,14 @@ function trackSubscribed(track, participant) {
         }
         var trackElement = track.attach();
         trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
+
+        if (track.kind == "video")
+        {
+            trackElement.setAttribute("width", '320')
+            trackElement.setAttribute("height", '240')
+        }
+
         participantDiv.childNodes[0].appendChild(trackElement);
-        participantDiv.childNodes[0].childNodes[0].setAttribute("width", '320')
-        participantDiv.childNodes[0].childNodes[0].setAttribute("height", '240')
 
         if (track.kind == "audio") {
             if (!track.isEnabled) {
