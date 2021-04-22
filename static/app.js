@@ -181,7 +181,7 @@ function trackSubscribed(track, participant) {
             participantDiv = document.createElement('div')
             participantDiv.setAttribute('class', 'col-2')
             participantDiv.setAttribute('id', participant.sid);
-            participantDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
+            participantDiv.setAttribute('style', 'width: auto; height: auto;');
 
             let tracksDiv = document.createElement('div');
             participantDiv.appendChild(tracksDiv);
