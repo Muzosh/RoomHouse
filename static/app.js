@@ -77,7 +77,7 @@ function muteOrUnmuteYourMedia(room, kind, action) {
         if (action === 'mute') {
             publication.track.disable();
         } else {
-            publication.track.enable();
+            publication.track.enable(); //je to rozbity, pri vypnuti kamery sa vypne aj screensharing
         }
     });
 }
@@ -89,7 +89,9 @@ function addLocalVideo() {
         resizeMode: "crop-and-scale"
     }).then(track => {
         let video = document.getElementById("local").firstElementChild;
-        video.appendChild(track.attach());
+        var trackElement = track.attach();
+        //trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
+        video.appendChild(trackElement);
     });
 };
 
@@ -199,8 +201,9 @@ function trackSubscribed(track, participant) {
 
             containerRow.appendChild(participantDiv);
         }
-
-        participantDiv.childNodes[0].appendChild(track.attach());
+        var trackElement = track.attach();
+        trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
+        participantDiv.childNodes[0].appendChild(trackElement);
 
         if (track.kind == "audio") {
             if (!track.isEnabled) {
@@ -253,7 +256,9 @@ function trackSubscribed(track, participant) {
         labelDiv.innerHTML = participant.identity + ' - screen';
         screenDiv.appendChild(labelDiv);
         screenShareContainerRow.appendChild(screenDiv);
-        screenDiv.childNodes[0].appendChild(track.attach());
+        var trackElement = track.attach();
+        trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
+        screenDiv.childNodes[0].appendChild(trackElement);
         screenDiv.childNodes[0].childNodes[0].setAttribute("width", '100%')
         screenDiv.childNodes[0].childNodes[0].setAttribute("height", 'auto')
 
@@ -296,7 +301,9 @@ function shareScreenHandler(name) {
                 localRoom.localParticipant.publishTrack(screenTrack);
 
                 let video = document.getElementById(name + '_screen').firstElementChild;
-                video.appendChild(screenTrack.attach());
+                var trackElement = screenTrack.attach();
+                trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
+                video.appendChild(trackElement);
                 video.childNodes[0].setAttribute("width", '100%')
                 video.childNodes[0].setAttribute("height", 'auto')
 
@@ -313,5 +320,40 @@ function shareScreenHandler(name) {
         screenTrack.stop();
         screenTrack = null;
         screen = false;
+    }
+};
+
+function zoomTrack(trackElement) {
+    if (!trackElement.classList.contains('participantZoomed')) {
+        // zoom in
+        containerRow.childNodes.forEach(participant => {
+            if (participant.className == 'col-2') {
+                participant.childNodes[0].childNodes.forEach(track => {
+                    if (track === trackElement) {
+                        track.classList.add('participantZoomed')
+                    }
+                    else {
+                        track.classList.add('participantHidden')
+                    }
+                });
+                participant.childNodes[1].classList.add('participantHidden');
+            }
+        });
+    }
+    else {
+        // zoom out
+        containerRow.childNodes.forEach(participant => {
+            if (participant.className == 'col-2') {
+                participant.childNodes[0].childNodes.forEach(track => {
+                    if (track === trackElement) {
+                        track.classList.remove('participantZoomed');
+                    }
+                    else {
+                        track.classList.remove('participantHidden');
+                    }
+                });
+                participant.childNodes[1].classList.remove('participantHidden');
+            }
+        });
     }
 };
