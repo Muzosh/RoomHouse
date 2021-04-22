@@ -255,12 +255,14 @@ function trackSubscribed(track, participant) {
         screenDiv.setAttribute('id', participant.sid + '_screen');
         screenDiv.setAttribute('class', 'col-12')
         screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
-        let tracksDiv = document.createElement('div');
-        screenDiv.appendChild(tracksDiv);
+
         let labelDiv = document.createElement('div');
-        labelDiv.innerHTML = participant.identity + ' - screen';
+        labelDiv.innerHTML = '<strong>' + participant.identity + ' - screen</strong>';
         screenDiv.appendChild(labelDiv);
         screenShareContainerRow.appendChild(screenDiv);
+
+        let tracksDiv = document.createElement('div');
+        screenDiv.appendChild(tracksDiv);
         var trackElement = track.attach();
         trackElement.addEventListener('click', () => { screenShareZoomTrack(trackElement); });
         screenDiv.childNodes[0].appendChild(trackElement);
@@ -290,12 +292,13 @@ function shareScreenHandler(name) {
         screenDiv.setAttribute('class', 'col-12')
         screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
 
-        let tracksDiv = document.createElement('div');
-        screenDiv.appendChild(tracksDiv);
         let labelDiv = document.createElement('div');
-        labelDiv.innerHTML = name + ' - screen';
+        labelDiv.innerHTML = '<strong>' + name + ' - screen</strong>';
         screenDiv.appendChild(labelDiv);
         screenShareContainerRow.appendChild(screenDiv);
+
+        let tracksDiv = document.createElement('div');
+        screenDiv.appendChild(tracksDiv);
 
         navigator.mediaDevices.getDisplayMedia()
             .then(stream => {
