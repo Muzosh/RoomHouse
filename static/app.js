@@ -75,7 +75,10 @@ function muteOrUnmuteYourMedia(room, kind, action) {
 
     publications.forEach(publication => {
         if (action === 'mute') {
-            publication.track.disable();
+            if (!publication.track.name.includes('screen'))
+            {
+                publication.track.disable();
+            }
         } else {
             publication.track.enable();
         }
