@@ -86,26 +86,20 @@ function muteOrUnmuteYourMedia(room, kind, action) {
 }
 
 function addLocalVideo() {
-    Twilio.Video.createLocalVideoTrack({
-        width: 320,
-        height: 240,
-        resizeMode: "crop-and-scale"
-    }).then(track => {
+    Twilio.Video.createLocalVideoTrack().then(track => {
         let video = document.getElementById("local").firstElementChild;
         var trackElement = track.attach();
         //trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
         video.appendChild(trackElement);
+        video.childNodes[0].setAttribute("width", '320')
+        video.childNodes[0].setAttribute("height", '240')
     });
 };
 
 function connect(token, roomId) {
     Twilio.Video.createLocalTracks({
         audio: true,
-        video: {
-            width: 320,
-            height: 240,
-            resizeMode: "crop-and-scale"
-        }
+        video: true
     }).then(localTracks => {
         return Twilio.Video.connect(token, {
             name: roomId,
@@ -207,6 +201,8 @@ function trackSubscribed(track, participant) {
         var trackElement = track.attach();
         trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
         participantDiv.childNodes[0].appendChild(trackElement);
+        participantDiv.childNodes[0].childNodes[0].setAttribute("width", '320')
+        participantDiv.childNodes[0].childNodes[0].setAttribute("height", '240')
 
         if (track.kind == "audio") {
             if (!track.isEnabled) {
@@ -265,7 +261,6 @@ function trackSubscribed(track, participant) {
         screenDiv.childNodes[0].appendChild(trackElement);
         screenDiv.childNodes[0].childNodes[0].setAttribute("width", '100%')
         screenDiv.childNodes[0].childNodes[0].setAttribute("height", 'auto')
-
     }
 };
 
