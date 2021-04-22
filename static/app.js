@@ -252,6 +252,7 @@ function trackSubscribed(track, participant) {
     } else {
         let screenDiv = document.createElement('div');
         screenDiv.setAttribute('id', participant.sid + '_screen');
+        screenDiv.setAttribute('class', 'col-12')
         screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
         let tracksDiv = document.createElement('div');
         screenDiv.appendChild(tracksDiv);
@@ -260,7 +261,7 @@ function trackSubscribed(track, participant) {
         screenDiv.appendChild(labelDiv);
         screenShareContainerRow.appendChild(screenDiv);
         var trackElement = track.attach();
-        trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
+        trackElement.addEventListener('click', () => { screenShareZoomTrack(trackElement); });
         screenDiv.childNodes[0].appendChild(trackElement);
         screenDiv.childNodes[0].childNodes[0].setAttribute("width", '100%')
         screenDiv.childNodes[0].childNodes[0].setAttribute("height", 'auto')
@@ -286,6 +287,7 @@ function shareScreenHandler(name) {
 
         let screenDiv = document.createElement('div');
         screenDiv.setAttribute('id', name + '_screen');
+        screenDiv.setAttribute('class', 'col-12')
         screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
 
         let tracksDiv = document.createElement('div');
@@ -305,7 +307,6 @@ function shareScreenHandler(name) {
 
                 let video = document.getElementById(name + '_screen').firstElementChild;
                 var trackElement = screenTrack.attach();
-                trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
                 video.appendChild(trackElement);
                 video.childNodes[0].setAttribute("width", '100%')
                 video.childNodes[0].setAttribute("height", 'auto')
@@ -313,6 +314,12 @@ function shareScreenHandler(name) {
                 screen = true;
             }).catch(() => {
                 alert('Could not share the screen.')
+                screenDiv.remove()
+                screenshareOff.style.display = "none";
+                screenshareOn.style.color = "white";
+                screenshareOn.style.display = "block";
+                screenTrack = null;
+                screen = false;
             });
     } else {
         screenshareOff.style.display = "none";
@@ -342,20 +349,6 @@ function zoomTrack(trackElement) {
                 participant.childNodes[1].classList.add('participantHidden');
             }
         });
-
-        screenShareContainerRow.childNodes.forEach(participant => {
-            if (participant.className == 'col-12') {
-                participant.childNodes[0].childNodes.forEach(track => {
-                    if (track === trackElement) {
-                        track.classList.add('participantZoomed')
-                    }
-                    else {
-                        track.classList.add('participantHidden')
-                    }
-                });
-                participant.childNodes[1].classList.add('participantHidden');
-            }
-        });
     }
     else {
         // zoom out
@@ -372,7 +365,29 @@ function zoomTrack(trackElement) {
                 participant.childNodes[1].classList.remove('participantHidden');
             }
         });
+    }
+};
 
+
+function screenShareZoomTrack(trackElement) {
+    if (!trackElement.classList.contains('participantZoomed')) {
+        // zoom in
+        screenShareContainerRow.childNodes.forEach(participant => {
+            if (participant.className == 'col-12') {
+                participant.childNodes[0].childNodes.forEach(track => {
+                    if (track === trackElement) {
+                        track.classList.add('participantZoomed')
+                    }
+                    else {
+                        track.classList.add('participantHidden')
+                    }
+                });
+                participant.childNodes[1].classList.add('participantHidden');
+            }
+        });
+    }
+    else {
+        // zoom out
         screenShareContainerRow.childNodes.forEach(participant => {
             if (participant.className == 'col-12') {
                 participant.childNodes[0].childNodes.forEach(track => {
