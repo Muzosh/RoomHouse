@@ -77,7 +77,7 @@ function muteOrUnmuteYourMedia(room, kind, action) {
         if (action === 'mute') {
             publication.track.disable();
         } else {
-            publication.track.enable(); //je to rozbity, pri vypnuti kamery sa vypne aj screensharing
+            publication.track.enable();
         }
     });
 }
@@ -339,11 +339,39 @@ function zoomTrack(trackElement) {
                 participant.childNodes[1].classList.add('participantHidden');
             }
         });
+
+        screenShareContainerRow.childNodes.forEach(participant => {
+            if (participant.className == 'col-12') {
+                participant.childNodes[0].childNodes.forEach(track => {
+                    if (track === trackElement) {
+                        track.classList.add('participantZoomed')
+                    }
+                    else {
+                        track.classList.add('participantHidden')
+                    }
+                });
+                participant.childNodes[1].classList.add('participantHidden');
+            }
+        });
     }
     else {
         // zoom out
         containerRow.childNodes.forEach(participant => {
             if (participant.className == 'col-2') {
+                participant.childNodes[0].childNodes.forEach(track => {
+                    if (track === trackElement) {
+                        track.classList.remove('participantZoomed');
+                    }
+                    else {
+                        track.classList.remove('participantHidden');
+                    }
+                });
+                participant.childNodes[1].classList.remove('participantHidden');
+            }
+        });
+
+        screenShareContainerRow.childNodes.forEach(participant => {
+            if (participant.className == 'col-12') {
                 participant.childNodes[0].childNodes.forEach(track => {
                     if (track === trackElement) {
                         track.classList.remove('participantZoomed');
