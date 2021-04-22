@@ -13,10 +13,7 @@ twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 twilio_api_key_sid = os.environ.get('TWILIO_API_KEY_SID')
 twilio_api_key_secret = os.environ.get('TWILIO_API_KEY_SECRET')
 
-web = Blueprint('web', __name__,
-                 template_folder='templates',
-                 static_folder='static')
-
+web = Blueprint('web', __name__, template_folder='templates', static_folder='static')
 
 class Room(db.Model):
     __tablename__ = 'rooms'
@@ -25,7 +22,7 @@ class Room(db.Model):
     #slug = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
-    clients = db.relationship('Client', backref='room')
+    clients = db.relationship('Client', backref='room', passive_deletes=True)
 
     def __repr__(self):
         return '<Room {}>'.format(self.name)
@@ -54,7 +51,7 @@ class Client(db.Model):
     name = db.Column(db.String(64), default='Guest')
     uuid = db.Column(db.String(32), unique=True, default=uuid.uuid4().hex)
     
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'))
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id', ondelete='CASCADE'))
 
     def __repr__(self):
         return '<Client {}>'.format(self.uuid) 
@@ -92,15 +89,15 @@ def joinroom(id):
     if request.method == 'POST':
         session['auth'] = False
         room = Room.query.filter(Room.id == id).first()
+        if room == None:
+            flash('The room does not exist, please create a new one.')
+            return render_template('joinroom.html')
+
         username = request.form.get("username")
         password = request.form.get("password")
         
         if username:
-            
-            # Commented IfElse should prevent you from kicking someone by taking your name
-            #  problem is that we cant delete from this DB when disconnecting, so even you disconnect, you cant use your name to get back
-            # if db.session.query(Client).filter_by(Client.name == username, Client.room_id == id).first() is not None
-        
+            if Client.query.filter(Client.name == username and Client.room_id == id).first() is None:
                 client = room.authenticate(password=password)
                 if client:
                     client.set_name(username)
@@ -120,9 +117,9 @@ def joinroom(id):
                 else:
                     flash('Incorrect password')
                     return render_template('joinroom.html')
-            # else:
-            #     flash('Username already exists!')
-            #     return render_template('joinroom.html')
+            else:
+                flash('Username already exists!')
+                return render_template('joinroom.html')
         else:
             flash("Username is required!")
             return render_template('joinroom.html')
