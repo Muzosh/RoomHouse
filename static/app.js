@@ -90,9 +90,9 @@ function addLocalVideo() {
         let video = document.getElementById("local").firstElementChild;
         var trackElement = track.attach();
         //trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
+        trackElement.setAttribute("width", '320')
+        trackElement.setAttribute("height", '240')
         video.appendChild(trackElement);
-        video.childNodes[0].setAttribute("width", '320')
-        video.childNodes[0].setAttribute("height", '240')
     });
 };
 
@@ -265,9 +265,9 @@ function trackSubscribed(track, participant) {
         screenDiv.appendChild(tracksDiv);
         var trackElement = track.attach();
         trackElement.addEventListener('click', () => { screenShareZoomTrack(trackElement); });
+        trackElement.setAttribute("width", '100%')
+        trackElement.setAttribute("height", 'auto')
         screenDiv.childNodes[0].appendChild(trackElement);
-        screenDiv.childNodes[0].childNodes[0].setAttribute("width", '100%')
-        screenDiv.childNodes[0].childNodes[0].setAttribute("height", 'auto')
     }
 };
 
@@ -295,10 +295,10 @@ function shareScreenHandler(name) {
         let labelDiv = document.createElement('div');
         labelDiv.innerHTML = '<strong>' + name + ' - screen</strong>';
         screenDiv.appendChild(labelDiv);
-        screenShareContainerRow.appendChild(screenDiv);
 
         let tracksDiv = document.createElement('div');
         screenDiv.appendChild(tracksDiv);
+        screenShareContainerRow.appendChild(screenDiv);
 
         navigator.mediaDevices.getDisplayMedia()
             .then(stream => {
@@ -310,9 +310,9 @@ function shareScreenHandler(name) {
 
                 let video = document.getElementById(name + '_screen').firstElementChild;
                 var trackElement = screenTrack.attach();
+                trackElement.setAttribute("width", '100%')
+                trackElement.setAttribute("height", 'auto')
                 video.appendChild(trackElement);
-                video.childNodes[0].setAttribute("width", '100%')
-                video.childNodes[0].setAttribute("height", 'auto')
 
                 screen = true;
             }).catch(() => {
