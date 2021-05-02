@@ -92,6 +92,7 @@ function addLocalVideo() {
         //trackElement.addEventListener('click', () => { zoomTrack(trackElement); });
         trackElement.setAttribute("width", '320')
         trackElement.setAttribute("height", '240')
+        trackElement.setAttribute("style", "box-shadow: 5px 5px 5px #191919;")
         video.appendChild(trackElement);
     });
 };
@@ -187,7 +188,7 @@ function trackSubscribed(track, participant) {
             participantDiv.appendChild(tracksDiv);
 
             let avatar = document.createElement('img');
-            avatar.src = "../static/avatar.jpg"
+            avatar.src = "../static/avatar.png"
             avatar.width = 320
             avatar.height = 240
             participantDiv.appendChild(avatar);
@@ -205,6 +206,7 @@ function trackSubscribed(track, participant) {
         {
             trackElement.setAttribute("width", '320')
             trackElement.setAttribute("height", '240')
+            trackElement.setAttribute("style", "box-shadow: 5px 5px 5px #191919;")
         }
 
         participantDiv.childNodes[0].appendChild(trackElement);
@@ -254,7 +256,7 @@ function trackSubscribed(track, participant) {
         let screenDiv = document.createElement('div');
         screenDiv.setAttribute('id', participant.sid + '_screen');
         screenDiv.setAttribute('class', 'col-12')
-        screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
+        screenDiv.setAttribute('style', 'width: auto; height: auto;');
 
         let labelDiv = document.createElement('div');
         labelDiv.innerHTML = '<strong>' + participant.identity + ' - screen</strong>';
@@ -267,6 +269,7 @@ function trackSubscribed(track, participant) {
         trackElement.addEventListener('click', () => { screenShareZoomTrack(trackElement); });
         trackElement.setAttribute("width", '100%')
         trackElement.setAttribute("height", 'auto')
+        trackElement.setAttribute("style", "box-shadow: 5px 5px 5px #191919;")
         screenDiv.childNodes[0].appendChild(trackElement);
     }
 };
@@ -290,7 +293,7 @@ function shareScreenHandler(name) {
         let screenDiv = document.createElement('div');
         screenDiv.setAttribute('id', name + '_screen');
         screenDiv.setAttribute('class', 'col-12')
-        screenDiv.setAttribute('style', 'width: auto; height: auto; border-radius: 10px;border: 5px solid black;margin:20px;');
+        screenDiv.setAttribute('style', 'width: auto; height: auto;');
 
         let labelDiv = document.createElement('div');
         labelDiv.innerHTML = '<strong>' + name + ' - screen</strong>';
@@ -312,6 +315,7 @@ function shareScreenHandler(name) {
                 var trackElement = screenTrack.attach();
                 trackElement.setAttribute("width", '100%')
                 trackElement.setAttribute("height", 'auto')
+                trackElement.setAttribute("style", "box-shadow: 5px 5px 5px #191919;")
                 video.appendChild(trackElement);
 
                 screen = true;

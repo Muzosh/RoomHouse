@@ -5,9 +5,10 @@
 {% block header %}
 <h1 class="float-md-start mb-0">RoomHouse</h1>
 <nav class="nav nav-masthead justify-content-center float-md-end">
+  <a class="nav-link" href="#">Home</a>
   <a class="nav-link active" href="#">Active room</a>
-  <a class="nav-link" href="/about">About</a>
-  <a class="nav-link" href="/joinroom/{{ room_id }}">Leave</a>
+  <a class="nav-link" href="/about">About project</a>
+  <a class="nav-link" href="/joinroom/{{ room_id }}">Leave room</a>
 </nav>
 {% endblock %}
 
@@ -21,13 +22,13 @@
 </style>
 
 <div id="single" class="w-100 mx-auto flex-column">
-  <div class="row" style="border: 5px solid #373736;margin: 20px;border-radius: 15px;background: #31363c;">
+  <div class="row" style="margin: 0px !important;border-radius: 15px;background: #31363c;">
     <div class="col-12" style="margin-top: 20px;">
       <H2><span class="badge bg-secondary">{{room_name}}</span></H2>
     </div>
     <div id="participantsCount" class="col-12"></div>
     <div id="inviteLink" class="col-12"></div>
-    <div class="col-12" style="margin-top: 20px;">
+    <div class="col-12" style="margin: 20px 0;">
       <div class="btn-group mb-3">
 
         <button type="button" id="camera-off" class="btn" onclick="cameraOnHandler();">
