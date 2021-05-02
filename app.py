@@ -141,3 +141,46 @@ def room(id):
 @web.route('/about', methods=['GET', 'POST'])
 def about_page():
     return render_template('about.html', room_id=session.get('roomname'))
+
+
+# error handling
+@web.errorhandler(504)
+def gateway_error(error):
+    logger.error('Error: %s', error)
+    return render_template('errors/errorTemplate.html', title="504", nameOfError="504", error=error), 504
+
+
+@web.errorhandler(500)
+def internal_server_error(error):
+    logger.error('Error: %s', error)
+    return render_template('errors/errorTemplate.html', title="500", nameOfError="500", error=error), 500
+
+
+@web.errorhandler(405)
+def method_error(error):
+    logger.error('Error: %s', error)
+    return render_template('errors/errorTemplate.html', title="405", nameOfError="405", error=error), 405
+
+
+@web.errorhandler(404)
+def not_found_error(error):
+    logger.error('Error: %s', error)
+    return render_template('errors/errorTemplate.html', title="404", nameOfError="404", error=error), 404
+
+
+@web.errorhandler(403)
+def forbidden_error(error):
+    logger.error('Error: %s', error)
+    return render_template('errors/errorTemplate.html', title="403", nameOfError="403", error=error), 403
+
+
+@web.errorhandler(401)
+def unauthorized_error(error):
+    logger.error('Error: %s', error)
+    return render_template('errors/errorTemplate.html', title="401", nameOfError="401", error=error), 401
+
+
+@web.errorhandler(400)
+def bad_request_error(error):
+    logger.error('Error: %s', error)
+    return render_template('errors/errorTemplate.html', title="400", nameOfError="400", error=error), 400
