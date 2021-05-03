@@ -5,21 +5,17 @@ Script for error page
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Error page of web application.">
-    <meta name="author" content="Slavomira Dzadikova">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/icon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/icon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/icon/favicon-16x16.png">
-    <link rel="manifest" href="/static/icon/site.webmanifest">
-
-    <title>{{ title }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="RoomHouse">
+        <meta name="author" content="Bc. Slavomira Dzadikova, Bc. Norbert Lovinger, Bc. Petr Muzikant">
+        <meta name="generator" content="RoomHouse - The safe place for pandemic situation">
+        <title>RoomHouse</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.min.css')}}">
 
     <!-- Custom styles for this template -->
-    <link href="/static/myCssFile.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static', filename='cover.css')}}">
 
   </head>
 
@@ -28,7 +24,7 @@ Script for error page
     <div class="center-div">
 
       <main role="main" class="inner cover">
-        <h1>{{ nameOfError }}</h1>
+        <h1>RoomHouse -- {{ nameOfError }}</h1>
         <p> {{ error }}</p>
 
       </main>

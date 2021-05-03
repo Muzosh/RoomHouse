@@ -1,3 +1,4 @@
+import logging
 import os
 import uuid
 import sqlalchemy
@@ -8,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask.blueprints import Blueprint
 from twilio.jwt.access_token import AccessToken
 from twilio.jwt.access_token.grants import VideoGrant
+logger = logging.getLogger(__name__)
 
 twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 twilio_api_key_sid = os.environ.get('TWILIO_API_KEY_SID')
