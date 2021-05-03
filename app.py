@@ -34,7 +34,7 @@ class Room(db.Model):
         #self.slug = slugify(name)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256:200000', salt_length=32)
 
     def authenticate(self, password):
     #def authenticate(self, password=None):
