@@ -1,2 +1,2 @@
-# ZMD_project
+# RoomHouse
 School project orientated around multimedia
